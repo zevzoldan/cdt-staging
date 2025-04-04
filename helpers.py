@@ -90,7 +90,5 @@ def slack__get_file_url(file, channel_id=None, slack_ts=None):
 
 def slack__get_permalink(channel_id, slack_ts):
 
-
-
     response = slack_client.chat_getPermalink(channel=channel_id, message_ts=slack_ts)
     return response["permalink"]

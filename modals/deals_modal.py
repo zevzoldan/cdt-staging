@@ -1143,6 +1143,7 @@ def deal_review_form_modal(
             "label": {"type": "plain_text", "text": "Owner Details"},
             "element": {
                 "type": "plain_text_input",
+                "multiline": True,
                 "action_id": "owner_details",
                 **(
                     {"initial_value": get_initial_value("owner_details__if_any_")}
@@ -1187,6 +1188,7 @@ def deal_review_form_modal(
             "element": {
                 "type": "plain_text_input",
                 "action_id": "additional_notes",
+                "multiline": True,
                 **(
                     {
                         "initial_value": get_initial_value(
@@ -1212,6 +1214,7 @@ def deal_review_form_modal(
             },
             "element": {
                 "type": "plain_text_input",
+                "multiline": True,
                 "action_id": "concerns_questions",
                 **(
                     {

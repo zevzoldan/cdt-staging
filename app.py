@@ -16,7 +16,7 @@ from hubspot_helper.create_new_record import (
 from hubspot_helper.query import get_contact_id
 from hubspot_helper.submission_processor import process_deal_review_submission
 from modals import deals_modal
-from slack_helper import send_deal_review_message
+from slack_helper import send_deal_review_message, send_slack_to_success_share_channel
 
 load_dotenv()
 
@@ -240,8 +240,11 @@ def button():
             file_urls = []
             for file in file_input:
                 try:
+                    channel_id = "C08FPMQS8LE"
+                    if os.environ["ENV"] == "DEV":
+                        channel_id = "C089FAUHSR5"
                     file_url = slack__get_file_url(
-                        file, channel_id="C08FPMQS8LE", slack_ts=None
+                        file, channel_id=channel_id, slack_ts=None
                     )
                     file_urls.append(file_url)
                 except Exception as e:
@@ -316,29 +319,55 @@ def button():
 
             create_closed_community_acquisition_record(datatosend, deal_id)
             if trigger_slack_post:
+                listofitemstopost = []
+                print("success_share_checkboxes >>>", success_share_checkboxes)
 
-                # get all of the items by this key:
-                # {
-                # "Your Full Name": "users_full_name",
-                # "Your First Name and Last Initial": "users_first_name_first_initial",
-                # "Name of the company acquired": company_name,
-                # "Company's website": website,
-                # "Purchase price": purchase_price,
-                # "Annual Revenue": annual_revenue,
-                # "Annual Profit, SDE, EBITDA": profit_sde_ebitda,
-                # "Basic terms of the deal": deal_terms,
-                # "How deal was financed": financing_method,
-                #             }
+                # split the success_share_checkboxes by ;
+                success_share_checkboxes = success_share_checkboxes.split(";")
+
                 for each_item in success_share_checkboxes:
+                    print("each_item >>>", each_item)
                     if each_item == "Your Full Name":
-                        datatosend["success_share_checkboxes"] = get_user_name(
-                            user_id
-                        ).get("real_name")
-                    elif each_item == "Your First Name and Last Initial":
-                        datatosend["success_share_checkboxes"] = (
-                            get_user_name(user_id).get("first_name")[:1]
-                            + get_user_name(user_id).get("last_name")[:1]
+                        listofitemstopost.append(
+                            {"Your Full Name": get_user_name(user_id).get("real_name")}
                         )
+                    elif each_item == "Your First Name and Last Initial":
+                        listofitemstopost.append(
+                            {
+                                "Your First Name and Last Initial": (
+                                    get_user_name(user_id)
+                                    .get("real_name")
+                                    .split(" ")[0]
+                                    + " "
+                                    + get_user_name(user_id)
+                                    .get("real_name")
+                                    .split(" ")[-1][:1]
+                                )
+                            }
+                        )
+                    elif each_item == "Name of the company acquired":
+                        listofitemstopost.append(
+                            {"Name of the company acquired": company_name}
+                        )
+                    elif each_item == "Company's website":
+                        listofitemstopost.append({"Company's website": website})
+                    elif each_item == "Purchase price":
+                        listofitemstopost.append({"Purchase price": purchase_price})
+                    elif each_item == "Annual Revenue":
+                        listofitemstopost.append({"Annual Revenue": annual_revenue})
+                    elif each_item == "Annual Profit, SDE, EBITDA":
+                        listofitemstopost.append(
+                            {"Annual Profit, SDE, EBITDA": profit_sde_ebitda}
+                        )
+                    elif each_item == "Basic terms of the deal":
+                        listofitemstopost.append(
+                            {"Basic terms of the deal": deal_terms}
+                        )
+                    elif each_item == "How deal was financed":
+                        listofitemstopost.append(
+                            {"How deal was financed": finance_type_options}
+                        )
+                send_slack_to_success_share_channel(listofitemstopost)
 
         if modal_callback == "deal_review_form":
             private_metadata = data["view"]["private_metadata"]

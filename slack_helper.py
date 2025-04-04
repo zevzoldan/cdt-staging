@@ -295,3 +295,51 @@ def send_deal_review_message(datatosend):
     )
 
     return slack_send.get("ts")
+
+
+def send_slack_to_success_share_channel(listofitemstopost):
+
+    print(listofitemstopost)
+
+    if os.environ["ENV"] == "PROD":
+        channel_id = "C05HGNS0XR6"
+    else:
+        channel_id = "C089FAUHSR5"
+    headerblock = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*There's a new deal that's closed!* :tada:",
+            },
+        },
+        {
+            "type": "divider",
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "The following details were shared:",
+            },
+        },
+    ]
+    blocks = []
+
+    for each_item in listofitemstopost:
+        for key, value in each_item.items():
+            blocks.append(
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"*{key}*: {value}",
+                    },
+                }
+            )
+    closeblock = headerblock + blocks
+    slack_send = slack_client.chat_postMessage(
+        channel=channel_id, text="Success Share", blocks=closeblock
+    )
+
+    return slack_send.get("ts")
