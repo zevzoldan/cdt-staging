@@ -64,7 +64,7 @@ def create_closed_community_acquisition_record(
             "company_name": f"{data.get('company_name')}",
             "where_d_you_find_source_this_deal_": f"{data.get('source')}",
             "what_is_the_website_": f"{data.get('website')}",
-            "what_is_the_annual_profit__sde__ebitda_": f"{int(data.get('profit_sde_ebitda', 0))}",
+            "what_is_the_annual_profit": f"{data.get('profit_sde_ebitda', None)}",
             "how_many_employees_are_there_": f"{data.get('employees')}",
             "deal_closed": f"{data.get('date_closed')}",
             "what_are_the_basic_terms_of_the_deal_structure___finances__payment_terms__transition_period__earn_o": f"{data.get('deal_terms')}",

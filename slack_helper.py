@@ -297,9 +297,7 @@ def send_deal_review_message(datatosend):
     return slack_send.get("ts")
 
 
-def send_slack_to_success_share_channel(listofitemstopost):
-
-    print(listofitemstopost)
+def send_slack_to_success_share_channel(user_id, listofitemstopost):
 
     if os.environ["ENV"] == "PROD":
         channel_id = "C05HGNS0XR6"
@@ -310,7 +308,7 @@ def send_slack_to_success_share_channel(listofitemstopost):
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": "*There's a new deal that's closed!* :tada:",
+                "text": f":rotating_light: *WE'VE GOT A CLOSER!* :rotating_light:\nAnother one of our own - <@{user_id}> - just crossed the finish line and became a business owner.\n\nNo more dreaming. No more “someday.” This member closed the deal and made it real.\n\nLet’s give them a massive shoutout—and if you’ve been lurking, watching from the sidelines, maybe it’s time to step into the arena too.\n\n:point_down: Drop your questions, congrats, and reactions below. Because this isn’t just their win—it’s proof that this stuff works.",
             },
         },
         {
@@ -320,7 +318,7 @@ def send_slack_to_success_share_channel(listofitemstopost):
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": "The following details were shared:",
+                "text": "Here's what they want to share with the Community:",
             },
         },
     ]

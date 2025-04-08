@@ -227,7 +227,7 @@ def deal_data_from_hubspot(deal_id):
         "company_name",
         "where_d_you_find_source_this_deal_",
         "what_is_the_website_",
-        "what_is_the_annual_profit__sde__ebitda_",
+        "what_is_the_annual_profit",
         "how_many_employees_are_there_",
         "deal_closed",
         "what_are_the_basic_terms_of_the_deal_structure___finances__payment_terms__transition_period__earn_o",

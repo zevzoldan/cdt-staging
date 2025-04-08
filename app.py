@@ -167,7 +167,7 @@ def button():
                 "business_type_industry": business_type,
                 "deal_name___description": business_description,
                 "annual_revenue": annual_revenue,
-                "what_is_the_annual_profit__sde__ebitda_": profit_sde_ebitda,
+                "what_is_the_annual_profit": profit_sde_ebitda,
                 "company_name": company_name,
                 "user_id": user_id,
                 "submitted_by": get_user_name(user_id).get("real_name"),
@@ -352,9 +352,13 @@ def button():
                     elif each_item == "Company's website":
                         listofitemstopost.append({"Company's website": website})
                     elif each_item == "Purchase price":
-                        listofitemstopost.append({"Purchase price": purchase_price})
+                        listofitemstopost.append(
+                            {"Purchase Price": f"${str(float(purchase_price))}"}
+                        )
                     elif each_item == "Annual Revenue":
-                        listofitemstopost.append({"Annual Revenue": annual_revenue})
+                        listofitemstopost.append(
+                            {"Annual Revenue": f"${str(float(annual_revenue))}"}
+                        )
                     elif each_item == "Annual Profit, SDE, EBITDA":
                         listofitemstopost.append(
                             {"Annual Profit, SDE, EBITDA": profit_sde_ebitda}
@@ -367,7 +371,7 @@ def button():
                         listofitemstopost.append(
                             {"How deal was financed": finance_type_options}
                         )
-                send_slack_to_success_share_channel(listofitemstopost)
+                send_slack_to_success_share_channel(user_id, listofitemstopost)
 
         if modal_callback == "deal_review_form":
             private_metadata = data["view"]["private_metadata"]

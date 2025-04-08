@@ -427,7 +427,8 @@ def basic_deal_info_form(
             "block_id": "annual_revenue",
             "label": {"type": "plain_text", "text": "What is the annual revenue?"},
             "element": {
-                "type": "plain_text_input",
+                "type": "number_input",
+                "is_decimal_allowed": False,
                 "action_id": "annual_revenue",
                 **(
                     {"initial_value": get_initial_value("annual_revenue")}
@@ -454,12 +455,11 @@ def basic_deal_info_form(
                 **(
                     {
                         "initial_value": str(
-                            deal_data.get("what_is_the_annual_profit__sde__ebitda_", "")
+                            deal_data.get("what_is_the_annual_profit", "")
                         )
                     }
-                    if "what_is_the_annual_profit__sde__ebitda_" in deal_data
-                    and deal_data.get("what_is_the_annual_profit__sde__ebitda_")
-                    is not None
+                    if "what_is_the_annual_profit" in deal_data
+                    and deal_data.get("what_is_the_annual_profit") is not None
                     else {}
                 ),
             },
@@ -1541,14 +1541,9 @@ def deal_closed_form_modal(
                 "type": "number_input",
                 "action_id": "profit_sde_ebitda",
                 **(
-                    {
-                        "initial_value": initial_value_number(
-                            "what_is_the_annual_profit__sde__ebitda_"
-                        )
-                    }
-                    if "what_is_the_annual_profit__sde__ebitda_" in deal_data
-                    and deal_data.get("what_is_the_annual_profit__sde__ebitda_")
-                    is not None
+                    {"initial_value": initial_value_number("what_is_the_annual_profit")}
+                    if "what_is_the_annual_profit" in deal_data
+                    and deal_data.get("what_is_the_annual_profit") is not None
                     else {}
                 ),
                 "is_decimal_allowed": False,
