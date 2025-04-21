@@ -1636,7 +1636,7 @@ def deal_closed_form_modal(
                         "value": "1-5 Other than the owner",
                     },
                     {"text": {"type": "plain_text", "text": "6-10"}, "value": "6-10"},
-                    {"text": {"type": "plain_text", "text": "10+"}, "value": "10_plus"},
+                    {"text": {"type": "plain_text", "text": "10+"}, "value": "10+"},
                 ],
             },
         },

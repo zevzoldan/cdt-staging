@@ -26,24 +26,6 @@ def get_headers() -> Dict[str, str]:
     }
 
 
-def make_request(
-    method: str,
-    url: str,
-    headers: Dict[str, str],
-    json: Optional[Dict[str, Any]] = None,
-) -> requests.Response:
-    try:
-        logging.info(
-            f"Making {method} request to {url} with headers: {headers} and payload: {json}"
-        )
-        response = requests.request(method, url, headers=headers, json=json)
-        response.raise_for_status()
-        return response
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Request failed: {e}")
-        raise
-
-
 def create_closed_community_acquisition_record(
     data: Dict[str, Any], deal_id: Optional[str] = None
 ):
@@ -79,20 +61,47 @@ def create_closed_community_acquisition_record(
 
     print("handling closed deal in HS")
     if deal_id is None:
-        response = requests.post(
-            f"https://api.hubapi.com/crm/v3/objects/2-32622392",
-            headers=headers,
-            json=payload,
-        )
-        print("creating new deal in HS", response.json())
+        try:
+            response = requests.post(
+                f"https://api.hubapi.com/crm/v3/objects/2-32622392",
+                headers=headers,
+                json=payload,
+            )
+            print("creating new deal in HS", response.json())
+        except Exception as e:
+            print(f"Error creating deal: {e}")
+            helper__send_error_data(
+                {
+                    "error": f"{e}",
+                    "payload": payload,
+                    "deal_id": deal_id,
+                }
+            )
+            return None
+
     else:
         print("updating existing deal in HS", deal_id)
-        response = requests.patch(
-            f"https://api.hubapi.com/crm/v3/objects/2-32622392/{deal_id}",
-            headers=headers,
-            json=payload,
-        )
-        print("updating existing deal in HS", deal_id, response.json())
+
+        try:
+            response = requests.patch(
+                f"https://api.hubapi.com/crm/v3/objects/2-32622392/{deal_id}",
+                headers=headers,
+                json=payload,
+            )
+            print("updating existing deal in HS", deal_id, response.json())
+        except Exception as e:
+            print(f"Error updating deal: {e}")
+
+            helper__send_error_data(
+                {
+                    "error": f"{e}",
+                    "payload": payload,
+                    "deal_id": deal_id,
+                }
+            )
+
+            return None
+
     deal_id = response.json().get("id")
     print("deal id is", deal_id)
     if deal_id:

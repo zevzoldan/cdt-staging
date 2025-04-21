@@ -42,3 +42,5 @@ def process_deal_review_submission(datatosend, deal_id):
 
     permalink = slack__get_permalink(channel_id, slack_send_ts)
     update_deal_stage(deal_id, datatosend={"link_to_slack_post": permalink})
+
+    
