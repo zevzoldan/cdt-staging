@@ -300,7 +300,7 @@ def send_deal_review_message(datatosend):
 def send_slack_to_success_share_channel(user_id, listofitemstopost):
 
     if os.environ["ENV"] == "PROD":
-        channel_id = "C05HGNS0XR6"
+        channel_id = "C05GLBYNC06"
     else:
         channel_id = "C089FAUHSR5"
     headerblock = [
