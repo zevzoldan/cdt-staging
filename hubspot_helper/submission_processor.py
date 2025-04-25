@@ -31,6 +31,8 @@ def process_deal_review_submission(datatosend, deal_id):
         create_open_community_acquisition_record,
     )
 
+    helper__send_submission_data_to_slack(datatosend)
+
     deal_id = create_open_community_acquisition_record(datatosend, deal_id)
 
     # save msg to HS
@@ -58,3 +60,18 @@ def helper__send_error_data(error, payload, deal_id):
         json={"error": error, "payload": payload, "deal_id": deal_id},
     )
     print(response.json())
+
+
+def helper__send_submission_data_to_slack(datatosend):
+    import os
+    from slack_sdk import WebClient
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
+    slack_client = WebClient(token=os.environ["SLACK_BOT_TOKEN"])
+
+    slack_client.chat_postMessage(
+        channel=os.environ["SLACK_CHANNEL"],
+        text=f"New submission: {datatosend}",
+    )
