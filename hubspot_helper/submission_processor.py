@@ -31,7 +31,9 @@ def process_deal_review_submission(datatosend, deal_id):
         create_open_community_acquisition_record,
     )
 
-    helper__send_submission_data_to_slack(datatosend)
+    helper__send_submission_data_to_slack(
+        datatosend.get("user_id"), "deal_review_form", datatosend
+    )
 
     deal_id = create_open_community_acquisition_record(datatosend, deal_id)
 
@@ -62,7 +64,7 @@ def helper__send_error_data(error, payload, deal_id):
     print(response.json())
 
 
-def helper__send_submission_data_to_slack(datatosend):
+def helper__send_submission_data_to_slack(user_id, typeofsubmission, datatosend):
     import os
     from slack_sdk import WebClient
     from dotenv import load_dotenv
@@ -71,7 +73,24 @@ def helper__send_submission_data_to_slack(datatosend):
 
     slack_client = WebClient(token=os.environ["SLACK_BOT_TOKEN"])
 
+    msg = slack_client.chat_postMessage(
+        channel="C08P4TFAPMZ",
+        text=f"New submission from {user_id}",
+        blocks=[
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"User: <@{user_id}>\nType: {typeofsubmission}",
+                },
+            },
+        ],
+    )
+
+    msg_ts = msg["ts"]
+
     slack_client.chat_postMessage(
-        channel=os.environ["SLACK_CHANNEL"],
-        text=f"New submission: {datatosend}",
+        channel="C08P4TFAPMZ",
+        text=f"```{datatosend}```",
+        thread_ts=msg_ts,
     )

@@ -14,7 +14,10 @@ from hubspot_helper.create_new_record import (
     update_deal_stage,
 )
 from hubspot_helper.query import get_contact_id
-from hubspot_helper.submission_processor import helper__send_submission_data_to_slack, process_deal_review_submission
+from hubspot_helper.submission_processor import (
+    helper__send_submission_data_to_slack,
+    process_deal_review_submission,
+)
 from modals import deals_modal
 from slack_helper import send_deal_review_message, send_slack_to_success_share_channel
 
@@ -174,6 +177,9 @@ def button():
             }
 
             deal_id = update_deal_stage(deal_id, datatosend)
+            helper__send_submission_data_to_slack(
+                user_id, "basic_deal_info_form", datatosend
+            )
             if deal_id:
                 contact_id = get_contact_id(user_id)
                 if contact_id is None:
@@ -318,7 +324,9 @@ def button():
                 datatosend["success_share_checkboxes"] = success_share_checkboxes
 
             create_closed_community_acquisition_record(datatosend, deal_id)
-            helper__send_submission_data_to_slack(datatosend)
+            helper__send_submission_data_to_slack(
+                user_id, "deal_closed_form", datatosend
+            )
             if trigger_slack_post:
                 listofitemstopost = []
                 print("success_share_checkboxes >>>", success_share_checkboxes)
@@ -501,12 +509,16 @@ def button():
                 "files_for_slack": file_urls,
             }
 
-            thread = threading.Thread(
-                target=process_deal_review_submission,
-                args=(datatosend, deal_id),
-            )
-            thread.start()
-            thread.join()
+            try:
+                thread = threading.Thread(
+                    target=process_deal_review_submission,
+                    args=(datatosend, deal_id),
+                )
+                thread.start()
+                # Don't join the thread here to avoid blocking the response
+                # thread.join()
+            except Exception as e:
+                print(f"Error starting thread for deal review submission: {e}")
 
             return make_response("", 200)
 
@@ -597,6 +609,16 @@ def button():
                         deal_id,
                         {
                             "deal_stage": selected_option,
+                            "user_id": user_id,
+                            "submitted_by": get_user_name(user_id).get("real_name"),
+                        },
+                    )
+                    helper__send_submission_data_to_slack(
+                        user_id,
+                        "update_deal_stage",
+                        {
+                            "deal_stage": selected_option,
+                            "deal_id": deal_id,
                             "user_id": user_id,
                             "submitted_by": get_user_name(user_id).get("real_name"),
                         },
