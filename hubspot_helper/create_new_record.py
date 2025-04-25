@@ -5,6 +5,7 @@ from typing import Optional, Dict, Any
 from helpers import get_user_name
 from dotenv import load_dotenv
 from hubspot_helper.query import get_contact_id
+from hubspot_helper.submission_processor import helper__send_error_data
 
 load_dotenv()
 
@@ -70,13 +71,7 @@ def create_closed_community_acquisition_record(
             print("creating new deal in HS", response.json())
         except Exception as e:
             print(f"Error creating deal: {e}")
-            helper__send_error_data(
-                {
-                    "error": f"{e}",
-                    "payload": payload,
-                    "deal_id": deal_id,
-                }
-            )
+            helper__send_error_data(e, payload, deal_id)
             return None
 
     else:
@@ -92,13 +87,7 @@ def create_closed_community_acquisition_record(
         except Exception as e:
             print(f"Error updating deal: {e}")
 
-            helper__send_error_data(
-                {
-                    "error": f"{e}",
-                    "payload": payload,
-                    "deal_id": deal_id,
-                }
-            )
+            helper__send_error_data(e, payload, deal_id)
 
             return None
 
@@ -157,17 +146,29 @@ def create_open_community_acquisition_record(
     }
     try:
         if deal_id is None:
-            response = requests.post(
-                f"https://api.hubapi.com/crm/v3/objects/2-32622392",
-                headers=headers,
-                json=payload,
-            )
+            try:
+                response = requests.post(
+                    f"https://api.hubapi.com/crm/v3/objects/2-32622392",
+                    headers=headers,
+                    json=payload,
+                )
+            except Exception as e:
+                print(f"Error creating deal: {e}")
+                helper__send_error_data(e, payload, deal_id)
+                return None
+
         else:
-            response = requests.patch(
-                f"https://api.hubapi.com/crm/v3/objects/2-32622392/{deal_id}",
-                headers=headers,
-                json=payload,
-            )
+            try:
+                response = requests.patch(
+                    f"https://api.hubapi.com/crm/v3/objects/2-32622392/{deal_id}",
+                    headers=headers,
+                    json=payload,
+                )
+            except Exception as e:
+                print(f"Error updating deal: {e}")
+                helper__send_error_data(e, payload, deal_id)
+                return None
+
     except Exception as e:
         print(f"Error creating open community acquisition record: {e}")
         return None

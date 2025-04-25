@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
+import requests
 
-from hubspot_helper.create_new_record import update_deal_stage
 
 load_dotenv()
 from helpers import slack__get_file_url, slack__get_permalink
@@ -41,6 +41,20 @@ def process_deal_review_submission(datatosend, deal_id):
         channel_id = "C089FAUHSR5"
 
     permalink = slack__get_permalink(channel_id, slack_send_ts)
+    from hubspot_helper.create_new_record import update_deal_stage
+
     update_deal_stage(deal_id, datatosend={"link_to_slack_post": permalink})
 
-    
+
+def helper__send_error_data(error, payload, deal_id):
+    print(f"Error: {error}")
+    print(f"Payload: {payload}")
+    print(f"Deal ID: {deal_id}")
+
+    # make a post request to the error endpoint
+
+    response = requests.post(
+        "https://hooks.zapier.com/hooks/catch/10763358/2xf43am/",
+        json={"error": error, "payload": payload, "deal_id": deal_id},
+    )
+    print(response.json())
