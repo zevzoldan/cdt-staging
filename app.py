@@ -14,7 +14,7 @@ from hubspot_helper.create_new_record import (
     update_deal_stage,
 )
 from hubspot_helper.query import get_contact_id
-from hubspot_helper.submission_processor import process_deal_review_submission
+from hubspot_helper.submission_processor import helper__send_submission_data_to_slack, process_deal_review_submission
 from modals import deals_modal
 from slack_helper import send_deal_review_message, send_slack_to_success_share_channel
 
@@ -318,6 +318,7 @@ def button():
                 datatosend["success_share_checkboxes"] = success_share_checkboxes
 
             create_closed_community_acquisition_record(datatosend, deal_id)
+            helper__send_submission_data_to_slack(datatosend)
             if trigger_slack_post:
                 listofitemstopost = []
                 print("success_share_checkboxes >>>", success_share_checkboxes)
