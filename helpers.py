@@ -78,8 +78,6 @@ def slack__get_file_url(file, channel_id=None, slack_ts=None):
                 files=[{"id": new_file_id}],
             )
 
-        print("Complete upload external response:", complete_response)
-
         # Step 5: Return the external URL
         return complete_response["files"][0]["permalink"]
 

@@ -469,8 +469,6 @@ def button():
                 except Exception as e:
                     continue
 
-            print("file_urls -->", file_urls)
-
             deal_calculator_ready = data["view"]["state"]["values"][
                 "deal_calculator_ready"
             ]["deal_calculator_ready"]["selected_options"][0]["value"]

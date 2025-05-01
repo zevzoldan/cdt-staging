@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 
 from slack_sdk import WebClient
@@ -292,6 +293,17 @@ def send_deal_review_message(datatosend, slack_send_ts=None):
     ]
 
     if slack_send_ts:
+        blocks.append(
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "mrkdwn",
+                        "text": f"This deal was updated by <@{datatosend.get('submitted_by')}> on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.",
+                    }
+                ],
+            }
+        )
         slack_send = slack_client.chat_update(
             channel=channel_id,
             text="New Deal",
