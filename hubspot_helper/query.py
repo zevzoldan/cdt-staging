@@ -71,7 +71,6 @@ def get_all_hubspot_comm_acquisition_records(value):
 
 
 def get_hubspot_comm_acquisition_records(value):
-    print("value", value)
     headers = {
         "Authorization": f"Bearer {os.environ['HUBSPOT_TOKEN']}",
         "Content-Type": "application/json",
@@ -236,6 +235,8 @@ def deal_data_from_hubspot(deal_id):
         "user_id",
         "we_d_love_to_share_your_success_with_our_audience_on_socials__please_let_us_know_what__if_anything_"
         "if_you_d_like_us_to_tag_you_on_socials__please_list_your_profile_name_s__here_",
+        "link_to_slack_post",
+        "slack_ts",
     ]
 
     response = requests.get(

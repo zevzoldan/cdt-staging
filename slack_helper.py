@@ -9,7 +9,7 @@ load_dotenv()
 slack_client = WebClient(token=os.environ["SLACK_BOT_TOKEN"])
 
 
-def send_deal_review_message(datatosend):
+def send_deal_review_message(datatosend, slack_send_ts=None):
 
     if os.environ["ENV"] == "PROD":
         channel_id = "C05HGNS0XR6"
@@ -290,9 +290,18 @@ def send_deal_review_message(datatosend):
         #     },
         # },
     ]
-    slack_send = slack_client.chat_postMessage(
-        channel=channel_id, text="New Deal", blocks=blocks
-    )
+
+    if slack_send_ts:
+        slack_send = slack_client.chat_update(
+            channel=channel_id,
+            text="New Deal",
+            blocks=blocks,
+            ts=slack_send_ts,
+        )
+    else:
+        slack_send = slack_client.chat_postMessage(
+            channel=channel_id, text="New Deal", blocks=blocks
+        )
 
     return slack_send.get("ts")
 

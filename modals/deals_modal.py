@@ -1123,7 +1123,7 @@ def deal_review_form_modal(
                         "value": "Retirement Funds",
                     },
                     {
-                        "text": {"type": "plain_text", "text": "HELOC"},
+                        "text": {"type": "plain_text", "text": "Heloc"},
                         "value": "Heloc",
                     },
                     {

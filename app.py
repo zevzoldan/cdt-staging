@@ -335,7 +335,6 @@ def button():
                 success_share_checkboxes = success_share_checkboxes.split(";")
 
                 for each_item in success_share_checkboxes:
-                    print("each_item >>>", each_item)
                     if each_item == "Your Full Name":
                         listofitemstopost.append(
                             {"Your Full Name": get_user_name(user_id).get("real_name")}

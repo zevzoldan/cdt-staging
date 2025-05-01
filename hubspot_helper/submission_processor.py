@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 import requests
 
+from hubspot_helper.query import deal_data_from_hubspot
+
 
 load_dotenv()
 from helpers import slack__get_file_url, slack__get_permalink
@@ -10,10 +12,16 @@ from slack_helper import send_deal_review_message
 
 def process_deal_review_submission(datatosend, deal_id):
 
-    print(deal_id, type(deal_id))
+    # if there is a deal id, lets call hubspot and get the existing slack msg. then well update tht msg
+
+    if deal_id:
+        deal_data = deal_data_from_hubspot(deal_id)
+        slack_send_ts = deal_data.get("slack_ts")
+    else:
+        slack_send_ts = None
 
     file_urls = datatosend.get("files_for_slack", [])
-    slack_send_ts = send_deal_review_message(datatosend)
+    slack_send_ts = send_deal_review_message(datatosend, slack_send_ts)
     clean_file_urls = []
     if os.environ["ENV"] == "PROD":
         channel_id = "C05HGNS0XR6"
@@ -27,6 +35,7 @@ def process_deal_review_submission(datatosend, deal_id):
         clean_file_urls.append(file_url)
 
     datatosend["file_url"] = ";".join(clean_file_urls)
+    datatosend["slack_ts"] = slack_send_ts
     from hubspot_helper.create_new_record import (
         create_open_community_acquisition_record,
     )
@@ -47,7 +56,13 @@ def process_deal_review_submission(datatosend, deal_id):
     permalink = slack__get_permalink(channel_id, slack_send_ts)
     from hubspot_helper.create_new_record import update_deal_stage
 
-    update_deal_stage(deal_id, datatosend={"link_to_slack_post": permalink})
+    update_deal_stage(
+        deal_id,
+        datatosend={
+            "link_to_slack_post": permalink,
+            "slack_ts": slack_send_ts,
+        },
+    )
 
 
 def helper__send_error_data(error, payload, deal_id):
