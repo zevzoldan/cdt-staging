@@ -1291,6 +1291,30 @@ def deal_review_form_modal(
                     else {}
                 ),
             },
+            "optional": True,
+        },
+                {
+            "type": "input",
+            "block_id": "sde_calculator_link",
+            "label": {
+                "type": "plain_text",
+                "text": "Link to your SDE calculator",
+            },
+            "hint": {
+                "type": "plain_text",
+                "text": "Please make sure the file is shared publicly with Read Only access. Alternatively, you can upload a screenshot above.",
+            },
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "sde_calculator_link",
+                **(
+                    {"initial_value": get_initial_value("link_to_your_sde_calculator")}
+                    if "link_to_your_deal_calculator" in deal_data
+                    and deal_data.get("link_to_your_sde_calculator") is not None
+                    else {}
+                ),
+            },
+            "optional": True,
         },
     ]
 

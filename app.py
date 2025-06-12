@@ -472,9 +472,16 @@ def button():
             deal_calculator_ready = data["view"]["state"]["values"][
                 "deal_calculator_ready"
             ]["deal_calculator_ready"]["selected_options"][0]["value"]
-            deal_calculator_link = data["view"]["state"]["values"][
-                "deal_calculator_link"
-            ]["deal_calculator_link"]["value"]
+            deal_calculator_link = None
+            if "deal_calculator_link" in data["view"]["state"]["values"]:
+                deal_calculator_link = data["view"]["state"]["values"][
+                    "deal_calculator_link"
+                ]["deal_calculator_link"]["value"]
+            sde_calculator_link = None
+            if "sde_calculator_link" in data["view"]["state"]["values"]:
+                sde_calculator_link = data["view"]["state"]["values"][
+                    "sde_calculator_link"
+                ]["sde_calculator_link"]["value"]
 
             datatosend = {
                 "share_mnl": share_mnl,
@@ -500,6 +507,7 @@ def button():
                 "concerns_questions": concerns_questions,
                 "deal_calculator_ready": deal_calculator_ready,
                 "deal_calculator_link": deal_calculator_link,
+                "sde_calculator_link": sde_calculator_link,
                 "submitted_by": user_id,
                 "user_id": user_id,
                 "company_name": company_name,

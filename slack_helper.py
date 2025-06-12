@@ -274,6 +274,13 @@ def send_deal_review_message(datatosend, slack_send_ts=None):
                 "text": f"*Here's the link to my Deal Calculator:*\n{datatosend.get('deal_calculator_link')}",
             },
         },
+                {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"*Here's the link to my SDE Calculator:*\n{datatosend.get('sde_calculator_link')}",
+            },
+        },
         {
             "type": "section",
             "text": {

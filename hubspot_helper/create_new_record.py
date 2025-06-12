@@ -131,6 +131,7 @@ def create_open_community_acquisition_record(
             "deal_stage": f"{data.get('deal_stage')}",
             "how_much_of_the_purchase_price_is_for_real_estate_": f"{data.get('real_estate_percentage')}",
             "link_to_your_deal_calculator": f"{data.get('deal_calculator_link')}",
+            "link_to_your_sde_calculator": f"{data.get('sde_calculator_link')}",
             "location_of_the_business": f"{data.get('location')}",
             "owner_details__if_any_": f"{data.get('owner_details')}",
             "proposed_purchase_price": f"{data.get('purchase_price')}",
