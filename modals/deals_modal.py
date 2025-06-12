@@ -1308,9 +1308,9 @@ def deal_review_form_modal(
                 "type": "plain_text_input",
                 "action_id": "sde_calculator_link",
                 **(
-                    {"initial_value": get_initial_value("link_to_your_sde_calculator")}
+                    {"initial_value": get_initial_value("sde_calculator_link")}
                     if "link_to_your_deal_calculator" in deal_data
-                    and deal_data.get("link_to_your_sde_calculator") is not None
+                    and deal_data.get("sde_calculator_link") is not None
                     else {}
                 ),
             },
