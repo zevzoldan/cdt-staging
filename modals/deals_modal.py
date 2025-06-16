@@ -1316,6 +1316,29 @@ def deal_review_form_modal(
             },
             "optional": True,
         },
+                        {
+            "type": "input",
+            "block_id": "deal_box_link",
+            "label": {
+                "type": "plain_text",
+                "text": "Link to your Deal Box calculator",
+            },
+            "hint": {
+                "type": "plain_text",
+                "text": "Please make sure the file is shared publicly with Read Only access. Alternatively, you can upload a screenshot above.",
+            },
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "deal_box_link",
+                **(
+                    {"initial_value": get_initial_value("deal_box_link")}
+                    if "link_to_your_deal_calculator" in deal_data
+                    and deal_data.get("deal_box_link") is not None
+                    else {}
+                ),
+            },
+            "optional": True,
+        },
     ]
 
     # Combine header and questions

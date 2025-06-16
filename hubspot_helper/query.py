@@ -196,6 +196,7 @@ def deal_data_from_hubspot(deal_id):
         "how_much_of_the_purchase_price_is_for_real_estate_",
         "link_to_your_deal_calculator",
         "sde_calculator_link",
+        "deal_box_link",
         "additional_notes__equipment__employees__why_you_like_the_deal_",
         "are_you_providing_sde_or_ebitda_for_earnings___please_specify_which_one_",
         "n2024_sde___ebitda",

@@ -132,6 +132,7 @@ def create_open_community_acquisition_record(
             "how_much_of_the_purchase_price_is_for_real_estate_": f"{data.get('real_estate_percentage')}",
             "link_to_your_deal_calculator": f"{data.get('deal_calculator_link')}",
             "sde_calculator_link": f"{data.get('sde_calculator_link')}",
+            "deal_box_link": f"{data.get('deal_box_link')}",
             "location_of_the_business": f"{data.get('location')}",
             "owner_details__if_any_": f"{data.get('owner_details')}",
             "proposed_purchase_price": f"{data.get('purchase_price')}",
