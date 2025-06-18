@@ -750,11 +750,28 @@ def button():
                 deals_modal.existing_deal_select_stage(
                     user_id, team_id, trigger_id, view_id, deal_id
                 )
-            if "payment_method" in action_id:
-                private_metadata = data["view"]["private_metadata"]
-                print("Payment method selected", selected_option)
 
-                if selected_option in ["SBA Loan", "ROBS", "401(k)"]:
+        if button_type == "multi_static_select":
+            action_id = data["actions"][0]["action_id"]
+            print("Multi static select button clicked", action_id)
+            selected_options = data["actions"][0]["selected_options"]
+            user_id = data["user"]["id"]
+            team_id = data["team"]["id"]
+            trigger_id = data["trigger_id"]
+            view_id = data["view"]["id"]
+
+            if "finance_type" in action_id:
+                private_metadata = data["view"]["private_metadata"]
+                print("Finance method selected", selected_options)
+                clean_options = []
+
+                for option in selected_options:
+                    clean_options.append(option["value"])
+
+
+                if any(
+                    option in ["SBA Loan", "ROBS", "401(k)"] for option in clean_options
+                ):
                     deals_modal.deal_closed_form_modal(
                         user_id,
                         team_id,
@@ -762,7 +779,7 @@ def button():
                         view_id,
                         private_metadata,
                         "pay_type",
-                        selected_option,
+                        clean_options,
                     )
 
         if button_type == "radio_buttons":

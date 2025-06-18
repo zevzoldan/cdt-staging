@@ -1134,6 +1134,67 @@ def deal_review_form_modal(
                         "text": {"type": "plain_text", "text": "Other"},
                         "value": "Other",
                     },
+                    {
+                        "text": {"type": "plain_text", "text": "401(k)"},
+                        "value": "401(k)",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Sweat Equity"},
+                        "value": "Sweat Equity",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Friends & Family"},
+                        "value": "Friends & Family",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "ROBS"},
+                        "value": "ROBS",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Peer-to-Peer Lending"},
+                        "value": "Peer-to-Peer Lending",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Self-Directed IRA's"},
+                        "value": "Self-Directed IRA's",
+                    },
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Credit Card/Line of Credit",
+                        },
+                        "value": "Credit Card/Line of Credit",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Angel Investors"},
+                        "value": "Angel Investors",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Federal/State Grant"},
+                        "value": "Federal/State Grant",
+                    },
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Cash Value Life Insurance",
+                        },
+                        "value": "Cash Value Life Insurance",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Independent Sponsor"},
+                        "value": "Independent Sponsor",
+                    },
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Securities Backed Lending",
+                        },
+                        "value": "Securities Backed Lending",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Private Grant"},
+                        "value": "Private Grant",
+                    },
                 ],
             },
         },
@@ -1293,7 +1354,7 @@ def deal_review_form_modal(
             },
             "optional": True,
         },
-                {
+        {
             "type": "input",
             "block_id": "sde_calculator_link",
             "label": {
@@ -1316,7 +1377,7 @@ def deal_review_form_modal(
             },
             "optional": True,
         },
-                        {
+        {
             "type": "input",
             "block_id": "deal_box_link",
             "label": {
@@ -1716,6 +1777,7 @@ def deal_closed_form_modal(
         },
         {
             "type": "input",
+            "dispatch_action": True,
             "block_id": "finance_type",
             "label": {
                 "type": "plain_text",
@@ -1923,7 +1985,7 @@ def deal_closed_form_modal(
                 },
             }
         ]
-    elif pay_type == "SBA Loan":
+    elif "SBA Loan" in pay_type :
         secondary_payment_qs = [
             {
                 "type": "input",
