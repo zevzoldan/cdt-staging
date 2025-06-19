@@ -1447,7 +1447,7 @@ def deal_closed_form_modal(
     print("new current state is", current_state)
 
     deal_id = current_state.get("deal_id")
-    pay_type = current_state.get("pay_type")
+    pay_type = current_state.get("pay_type", "")
     acquire_deal_before_or_after_joining = current_state.get(
         "acquire_deal_before_or_after_joining"
     )
@@ -1481,6 +1481,7 @@ def deal_closed_form_modal(
         elif deal_data.get(field) is not None:
             return deal_data.get(field)
         else:
+            print("else")
             return " "
 
     def initial_value_number(field):
@@ -1520,6 +1521,7 @@ def deal_closed_form_modal(
     def get_initial_option(field):
         """Helper to create initial_option for dropdowns and radio buttons."""
         value = current_state.get(field) or deal_data.get(field)
+        print("value is ----->", value, "field is ----->", field)
         if value is not None:
             return {
                 "text": {"type": "plain_text", "text": str(value), "emoji": True},
@@ -1829,6 +1831,67 @@ def deal_closed_form_modal(
                         "text": {"type": "plain_text", "text": "Other"},
                         "value": "Other",
                     },
+                    {
+                        "text": {"type": "plain_text", "text": "401(k)"},
+                        "value": "401(k)",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Sweat Equity"},
+                        "value": "Sweat Equity",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Friends & Family"},
+                        "value": "Friends & Family",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "ROBS"},
+                        "value": "ROBS",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Peer-to-Peer Lending"},
+                        "value": "Peer-to-Peer Lending",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Self-Directed IRA's"},
+                        "value": "Self-Directed IRA's",
+                    },
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Credit Card/Line of Credit",
+                        },
+                        "value": "Credit Card/Line of Credit",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Angel Investors"},
+                        "value": "Angel Investors",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Federal/State Grant"},
+                        "value": "Federal/State Grant",
+                    },
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Cash Value Life Insurance",
+                        },
+                        "value": "Cash Value Life Insurance",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Independent Sponsor"},
+                        "value": "Independent Sponsor",
+                    },
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Securities Backed Lending",
+                        },
+                        "value": "Securities Backed Lending",
+                    },
+                    {
+                        "text": {"type": "plain_text", "text": "Private Grant"},
+                        "value": "Private Grant",
+                    },
                 ],
             },
         },
@@ -1954,8 +2017,14 @@ def deal_closed_form_modal(
 
     guidant_checkbox_block = []
     secondary_payment_qs = []
-    if pay_type in ["ROBS", "401(k)"]:
-        guidant_checkbox_block = [
+    if (
+        any(pt in pay_type for pt in ["ROBS", "401(k)"])
+        or deal_data.get("financing_method") in ["ROBS", "401(k)"]
+        or "guidant_used" in deal_data
+    ):
+        print("guidant_checkbox_block")
+        inputfields.insert(
+            11,
             {
                 "type": "input",
                 "block_id": "guidant_checkbox",
@@ -1964,29 +2033,36 @@ def deal_closed_form_modal(
                     "text": "Did you use Guidant?",
                 },
                 "element": {
-                    "type": "checkboxes",
+                    "type": "radio_buttons",
                     "action_id": "guidant_checkbox",
                     **(
-                        {"initial_options": get_initial_option("guidant_used")}
+                        {"initial_option": get_initial_option("guidant_used")}
                         if "guidant_used" in deal_data
                         and deal_data.get("guidant_used") is not None
                         else {}
                     ),
                     "options": [
                         {
-                            "text": {"type": "plain_text", "text": "Yes"},
+                            "text": {"type": "plain_text", "text": "true"},
                             "value": "true",
                         },
                         {
-                            "text": {"type": "plain_text", "text": "No"},
+                            "text": {"type": "plain_text", "text": "false"},
                             "value": "false",
                         },
                     ],
                 },
-            }
-        ]
-    elif "SBA Loan" in pay_type :
-        secondary_payment_qs = [
+            },
+        )
+        print("guidant_checkbox_block added")
+    if (
+        any(pt in pay_type for pt in ["SBA Loan"])
+        or deal_data.get("financing_method") in ["SBA Loan"]
+        or "sba_lender" in deal_data
+    ):
+        print("sba_loan_lender_block")
+        inputfields.insert(
+            11,
             {
                 "type": "input",
                 "block_id": "sba_loan_lender",
@@ -2001,9 +2077,9 @@ def deal_closed_form_modal(
                         else {}
                     ),
                 },
-            }
-        ]
-
+            },
+        )
+        print("sba_loan_lender_block added")
     acquired_after_blocks = []
     if acquire_deal_before_or_after_joining == "after":
         acquired_after_blocks = [

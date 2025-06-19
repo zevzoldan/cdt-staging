@@ -270,7 +270,7 @@ def button():
             if "guidant_checkbox" in data["view"]["state"]["values"]:
                 guidant_checkbox = data["view"]["state"]["values"]["guidant_checkbox"][
                     "guidant_checkbox"
-                ]["selected_options"][0]["value"]
+                ]["selected_option"]["value"]
 
             success_share_checkboxes = []
             clean_list = []
@@ -767,7 +767,6 @@ def button():
 
                 for option in selected_options:
                     clean_options.append(option["value"])
-
 
                 if any(
                     option in ["SBA Loan", "ROBS", "401(k)"] for option in clean_options
