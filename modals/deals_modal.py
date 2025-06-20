@@ -543,7 +543,10 @@ def existing_deal_select_stage(user_id, team_id, trigger_id, view_id, deal_id=No
             },
         },
     ]
-    if usersdeals == []:
+    blocks = []
+    if deal_id is not None:
+        blocks = selectstage
+    elif usersdeals == []:
         blocks = [
             {
                 "type": "section",
@@ -554,9 +557,6 @@ def existing_deal_select_stage(user_id, team_id, trigger_id, view_id, deal_id=No
             }
         ]
 
-    blocks = []
-    if deal_id is not None:
-        blocks = selectstage
     else:
         blocks = selectdeal
 
