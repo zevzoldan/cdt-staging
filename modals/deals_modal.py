@@ -484,6 +484,8 @@ def existing_deal_select_stage(user_id, team_id, trigger_id, view_id, deal_id=No
 
     usersdeals = []
     listofusersrecords = get_hubspot_comm_acquisition_records(user_id)
+    if os.environ["ENV"] == "DEV":
+        print("listofusersrecords -->", listofusersrecords)
     for record in listofusersrecords:
         clean_name = f"{record[1]} - {record[3]}"  # max 75 characters
         if len(clean_name) > 75:
