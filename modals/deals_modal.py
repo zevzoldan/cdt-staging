@@ -541,6 +541,16 @@ def existing_deal_select_stage(user_id, team_id, trigger_id, view_id, deal_id=No
             },
         },
     ]
+    if usersdeals == []:
+        blocks = [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "No deals found for this user.",
+                },
+            }
+        ]
 
     blocks = []
     if deal_id is not None:
