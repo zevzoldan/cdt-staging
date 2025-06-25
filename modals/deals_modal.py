@@ -629,6 +629,7 @@ def deal_review_form_modal(
         pprint(options)
         return options
 
+
     def get_initial_value(field):
         """Helper to retrieve initial value from deal_data."""
         if deal_data.get(field) is not None:
@@ -644,6 +645,9 @@ def deal_review_form_modal(
                 "value": str(value),
             }
         return None
+
+
+
 
     # Industry Options
     businessindustryoptions = []
@@ -1364,7 +1368,6 @@ def deal_review_form_modal(
                     else {}
                 ),
             },
-            "optional": True,
         },
         {
             "type": "input",
@@ -1480,6 +1483,18 @@ def deal_closed_form_modal(
         header.append({"type": "divider"})
         deal_data = deal_data_from_hubspot(deal_id)
 
+    def get_initial_option_guidant(field):
+        value = deal_data.get(field)
+        print("value is for guidant ----->", value)
+        if value is not None:
+            label = "Yes" if value == "True" or value == "true" else "No" if value == "False" or value == "false" else str(value)
+            return {
+                "text": {"type": "plain_text", "text": label, "emoji": True},
+                "value": str(value),
+            }
+        return None
+
+
     def get_initial_date(field):
         # structure as yyyy-mm-dd
         if field in deal_data and deal_data.get(field) is not None:
@@ -1534,7 +1549,7 @@ def deal_closed_form_modal(
         """Helper to create initial_option for dropdowns and radio buttons."""
         value = current_state.get(field) or deal_data.get(field)
         print("value is ----->", value, "field is ----->", field)
-        if value is not None:
+        if value is not None and str(value).strip():  # Check that string value is not empty
             return {
                 "text": {"type": "plain_text", "text": str(value), "emoji": True},
                 "value": str(value),
@@ -2032,7 +2047,7 @@ def deal_closed_form_modal(
     if (
         any(pt in pay_type for pt in ["ROBS", "401(k)"])
         or deal_data.get("financing_method") in ["ROBS", "401(k)"]
-        or "guidant_used" in deal_data
+        or deal_data.get("guidant_used") == "true"
     ):
         print("guidant_checkbox_block")
         inputfields.insert(
@@ -2048,18 +2063,18 @@ def deal_closed_form_modal(
                     "type": "radio_buttons",
                     "action_id": "guidant_checkbox",
                     **(
-                        {"initial_option": get_initial_option("guidant_used")}
+                        {"initial_option": get_initial_option_guidant("guidant_used")}
                         if "guidant_used" in deal_data
                         and deal_data.get("guidant_used") is not None
                         else {}
                     ),
                     "options": [
                         {
-                            "text": {"type": "plain_text", "text": "true"},
+                            "text": {"type": "plain_text", "text": "Yes"},
                             "value": "true",
                         },
                         {
-                            "text": {"type": "plain_text", "text": "false"},
+                            "text": {"type": "plain_text", "text": "No"},
                             "value": "false",
                         },
                     ],
@@ -2070,7 +2085,7 @@ def deal_closed_form_modal(
     if (
         any(pt in pay_type for pt in ["SBA Loan"])
         or deal_data.get("financing_method") in ["SBA Loan"]
-        or "sba_lender" in deal_data
+        or deal_data.get("sba_lender") is not None and deal_data.get("sba_lender") != "None"
     ):
         print("sba_loan_lender_block")
         inputfields.insert(
