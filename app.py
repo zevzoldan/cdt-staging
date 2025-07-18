@@ -262,9 +262,17 @@ def button():
 
             sba_loan_lender = None
             if "sba_loan_lender" in data["view"]["state"]["values"]:
-                sba_loan_lender = data["view"]["state"]["values"]["sba_loan_lender"][
+                selected_lender = data["view"]["state"]["values"]["sba_loan_lender"][
                     "sba_loan_lender"
-                ]["value"]
+                ]["selected_option"]["value"]
+                
+                # If "Other" is selected, use the value from the "Other" field
+                if selected_lender == "Other" and "sba_loan_lender_other" in data["view"]["state"]["values"]:
+                    sba_loan_lender = data["view"]["state"]["values"]["sba_loan_lender_other"][
+                        "sba_loan_lender_other"
+                    ]["value"]
+                else:
+                    sba_loan_lender = selected_lender
 
             guidant_checkbox = "false"
             if "guidant_checkbox" in data["view"]["state"]["values"]:
@@ -380,6 +388,8 @@ def button():
                             {"How deal was financed": finance_type_options}
                         )
                 send_slack_to_success_share_channel(user_id, listofitemstopost)
+
+
 
         if modal_callback == "deal_review_form":
             private_metadata = data["view"]["private_metadata"]
@@ -749,6 +759,18 @@ def button():
 
                 deals_modal.existing_deal_select_stage(
                     user_id, team_id, trigger_id, view_id, deal_id
+                )
+                
+            if action_id == "sba_loan_lender":
+                private_metadata = data["view"]["private_metadata"]
+                deals_modal.deal_closed_form_modal(
+                    user_id,
+                    team_id,
+                    trigger_id,
+                    view_id,
+                    private_metadata,
+                    "sba_loan_lender",
+                    selected_option,
                 )
 
         if button_type == "multi_static_select":
