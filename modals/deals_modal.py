@@ -2179,6 +2179,10 @@ def deal_closed_form_modal(
 
     guidant_checkbox_block = []
     secondary_payment_qs = []
+    
+    # Track insertion positions
+    current_position = 11
+    
     if (
         any(pt in pay_type for pt in ["ROBS", "401(k)"])
         or deal_data.get("financing_method") in ["ROBS", "401(k)"]
@@ -2186,7 +2190,7 @@ def deal_closed_form_modal(
     ):
         print("guidant_checkbox_block")
         inputfields.insert(
-            11,
+            current_position,
             {
                 "type": "input",
                 "block_id": "guidant_checkbox",
@@ -2217,6 +2221,8 @@ def deal_closed_form_modal(
             },
         )
         print("guidant_checkbox_block added")
+        current_position += 1
+    
     if (
         any(pt in pay_type for pt in ["SBA Loan"])
         or deal_data.get("financing_method") in ["SBA Loan"]
@@ -2224,7 +2230,7 @@ def deal_closed_form_modal(
     ):
         print("sba_loan_lender_block")
         inputfields.insert(
-            11,
+            current_position,
             {
                 "type": "input",
                 "block_id": "sba_loan_lender",
@@ -2266,6 +2272,7 @@ def deal_closed_form_modal(
             },
         )
         print("sba_loan_lender_block added")
+        current_position += 1
         
         # Add conditional "Other" field if "Other" is selected or if current value is not in the predefined list
         current_lender = current_state.get("sba_loan_lender") or deal_data.get("sba_lender")
@@ -2273,7 +2280,7 @@ def deal_closed_form_modal(
         
         if current_lender == "Other" or (current_lender and current_lender not in predefined_lenders and current_lender != "None"):
             inputfields.insert(
-                12,
+                current_position,
                 {
                     "type": "input",
                     "block_id": "sba_loan_lender_other",
