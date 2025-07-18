@@ -2180,48 +2180,8 @@ def deal_closed_form_modal(
     guidant_checkbox_block = []
     secondary_payment_qs = []
     
-    # Track insertion positions
+    # Track insertion positions - start after finance_type field (position 10)
     current_position = 11
-    
-    if (
-        any(pt in pay_type for pt in ["ROBS", "401(k)"])
-        or deal_data.get("financing_method") in ["ROBS", "401(k)"]
-        or deal_data.get("guidant_used") == "true"
-    ):
-        print("guidant_checkbox_block")
-        inputfields.insert(
-            current_position,
-            {
-                "type": "input",
-                "block_id": "guidant_checkbox",
-                "label": {
-                    "type": "plain_text",
-                    "text": "Did you use Guidant?",
-                },
-                "element": {
-                    "type": "radio_buttons",
-                    "action_id": "guidant_checkbox",
-                    **(
-                        {"initial_option": get_initial_option_guidant("guidant_used")}
-                        if "guidant_used" in deal_data
-                        and deal_data.get("guidant_used") is not None
-                        else {}
-                    ),
-                    "options": [
-                        {
-                            "text": {"type": "plain_text", "text": "Yes"},
-                            "value": "true",
-                        },
-                        {
-                            "text": {"type": "plain_text", "text": "No"},
-                            "value": "false",
-                        },
-                    ],
-                },
-            },
-        )
-        print("guidant_checkbox_block added")
-        current_position += 1
     
     if (
         any(pt in pay_type for pt in ["SBA Loan"])
@@ -2297,6 +2257,46 @@ def deal_closed_form_modal(
                 },
             )
             print("sba_loan_lender_other_block added")
+            current_position += 1
+    
+    if (
+        any(pt in pay_type for pt in ["ROBS", "401(k)"])
+        or deal_data.get("financing_method") in ["ROBS", "401(k)"]
+        or deal_data.get("guidant_used") == "true"
+    ):
+        print("guidant_checkbox_block")
+        inputfields.insert(
+            current_position,
+            {
+                "type": "input",
+                "block_id": "guidant_checkbox",
+                "label": {
+                    "type": "plain_text",
+                    "text": "Did you use Guidant?",
+                },
+                "element": {
+                    "type": "radio_buttons",
+                    "action_id": "guidant_checkbox",
+                    **(
+                        {"initial_option": get_initial_option_guidant("guidant_used")}
+                        if "guidant_used" in deal_data
+                        and deal_data.get("guidant_used") is not None
+                        else {}
+                    ),
+                    "options": [
+                        {
+                            "text": {"type": "plain_text", "text": "Yes"},
+                            "value": "true",
+                        },
+                        {
+                            "text": {"type": "plain_text", "text": "No"},
+                            "value": "false",
+                        },
+                    ],
+                },
+            },
+        )
+        print("guidant_checkbox_block added")
     acquired_after_blocks = []
     if acquire_deal_before_or_after_joining == "after":
         acquired_after_blocks = [
