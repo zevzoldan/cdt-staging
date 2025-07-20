@@ -1876,44 +1876,6 @@ def deal_closed_form_modal(
         },
         {
             "type": "input",
-            "block_id": "employees",
-            "label": {
-                "type": "plain_text",
-                "text": "How many employees are there?",
-            },
-            "element": {
-                "type": "static_select",
-                "action_id": "employees",
-                "placeholder": {"type": "plain_text", "text": "Select an option"},
-                **(
-                    {
-                        "initial_option": get_initial_option(
-                            "how_many_employees_are_there_"
-                        )
-                    }
-                    if "how_many_employees_are_there_" in deal_data
-                    and deal_data.get("how_many_employees_are_there_") is not None
-                    else {}
-                ),
-                "options": [
-                    {
-                        "text": {"type": "plain_text", "text": "None. Just the owner."},
-                        "value": "None. Just the owner.",
-                    },
-                    {
-                        "text": {
-                            "type": "plain_text",
-                            "text": "1-5 Other than the owner",
-                        },
-                        "value": "1-5 Other than the owner",
-                    },
-                    {"text": {"type": "plain_text", "text": "6-10"}, "value": "6-10"},
-                    {"text": {"type": "plain_text", "text": "10+"}, "value": "10+"},
-                ],
-            },
-        },
-        {
-            "type": "input",
             "dispatch_action": True,
             "block_id": "finance_type",
             "label": {
@@ -2027,6 +1989,44 @@ def deal_closed_form_modal(
                         "text": {"type": "plain_text", "text": "Private Grant"},
                         "value": "Private Grant",
                     },
+                ],
+            },
+        },
+        {
+            "type": "input",
+            "block_id": "employees",
+            "label": {
+                "type": "plain_text",
+                "text": "How many employees are there?",
+            },
+            "element": {
+                "type": "static_select",
+                "action_id": "employees",
+                "placeholder": {"type": "plain_text", "text": "Select an option"},
+                **(
+                    {
+                        "initial_option": get_initial_option(
+                            "how_many_employees_are_there_"
+                        )
+                    }
+                    if "how_many_employees_are_there_" in deal_data
+                    and deal_data.get("how_many_employees_are_there_") is not None
+                    else {}
+                ),
+                "options": [
+                    {
+                        "text": {"type": "plain_text", "text": "None. Just the owner."},
+                        "value": "None. Just the owner.",
+                    },
+                    {
+                        "text": {
+                            "type": "plain_text",
+                            "text": "1-5 Other than the owner",
+                        },
+                        "value": "1-5 Other than the owner",
+                    },
+                    {"text": {"type": "plain_text", "text": "6-10"}, "value": "6-10"},
+                    {"text": {"type": "plain_text", "text": "10+"}, "value": "10+"},
                 ],
             },
         },
@@ -2297,6 +2297,7 @@ def deal_closed_form_modal(
             },
         )
         print("guidant_checkbox_block added")
+    
     acquired_after_blocks = []
     if acquire_deal_before_or_after_joining == "after":
         acquired_after_blocks = [
