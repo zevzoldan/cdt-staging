@@ -1914,33 +1914,6 @@ def deal_closed_form_modal(
         },
         {
             "type": "input",
-            "block_id": "deal_terms",
-            "label": {
-                "type": "plain_text",
-                "text": "What are the basic terms of the deal structure?",
-            },
-            "element": {
-                "type": "plain_text_input",
-                "action_id": "deal_terms",
-                "multiline": True,
-                **(
-                    {
-                        "initial_value": get_initial_value(
-                            "what_are_the_basic_terms_of_the_deal_structure___finances__payment_terms__transition_period__earn_o"
-                        )
-                    }
-                    if "what_are_the_basic_terms_of_the_deal_structure___finances__payment_terms__transition_period__earn_o"
-                    in deal_data
-                    and deal_data.get(
-                        "what_are_the_basic_terms_of_the_deal_structure___finances__payment_terms__transition_period__earn_o"
-                    )
-                    is not None
-                    else {}
-                ),
-            },
-        },
-        {
-            "type": "input",
             "dispatch_action": True,
             "block_id": "finance_type",
             "label": {
@@ -2055,6 +2028,33 @@ def deal_closed_form_modal(
                         "value": "Private Grant",
                     },
                 ],
+            },
+        },
+        {
+            "type": "input",
+            "block_id": "deal_terms",
+            "label": {
+                "type": "plain_text",
+                "text": "What are the basic terms of the deal structure?",
+            },
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "deal_terms",
+                "multiline": True,
+                **(
+                    {
+                        "initial_value": get_initial_value(
+                            "what_are_the_basic_terms_of_the_deal_structure___finances__payment_terms__transition_period__earn_o"
+                        )
+                    }
+                    if "what_are_the_basic_terms_of_the_deal_structure___finances__payment_terms__transition_period__earn_o"
+                    in deal_data
+                    and deal_data.get(
+                        "what_are_the_basic_terms_of_the_deal_structure___finances__payment_terms__transition_period__earn_o"
+                    )
+                    is not None
+                    else {}
+                ),
             },
         },
         {
@@ -2180,8 +2180,8 @@ def deal_closed_form_modal(
     guidant_checkbox_block = []
     secondary_payment_qs = []
     
-    # Track insertion positions - start after finance_type field (position 10)
-    current_position = 11
+    # Track insertion positions - start after finance_type field (position 9)
+    current_position = 10
     
     if (
         any(pt in pay_type for pt in ["SBA Loan"])
