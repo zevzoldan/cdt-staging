@@ -225,6 +225,9 @@ def button():
             deal_terms = data["view"]["state"]["values"]["deal_terms"]["deal_terms"][
                 "value"
             ]
+            business_type = data["view"]["state"]["values"]["business_type"][
+                "business_type"
+            ]["selected_option"]["value"]
             finance_type_options = []
             finance_type = data["view"]["state"]["values"]["finance_type"][
                 "finance_type"
@@ -324,6 +327,7 @@ def button():
                 "user_id": user_id,
                 "deal_stage": deal_stage,
                 "success_share_text": success_share_text,
+                "business_type": business_type,
             }
 
             if company_name is not None:
