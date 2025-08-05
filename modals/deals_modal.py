@@ -767,6 +767,9 @@ def deal_review_form_modal(
         )
 
     # Form Fields
+    # Check if this is a new deal or updating an existing deal
+    is_new_deal = not deal_id
+
     questionblocks = [
         {
             "type": "input",
@@ -1306,24 +1309,25 @@ def deal_review_form_modal(
                 ),
             },
         },
-        {
-            "type": "input",
-            "block_id": "file_input",
-            "label": {
-                "type": "plain_text",
-                "text": "Please attach 1-3 years P&L and/or taxes. Ideally, upload a spreadsheet with the P&Ls year-by-year all in one sheet.",
-            },
-            "element": {
-                "type": "file_input",
-                "action_id": "file_input",
-                "filetypes": ["jpg", "png", "gif", "jpeg", "pdf"],
-                "max_files": 5,
-            },
-            "hint": {
-                "type": "plain_text",
-                "text": "You can upload .png, .jpg, .jpeg, or .pdf files.",
-            },
-        },
+        # Only include file upload for new deals
+        *([{
+                "type": "input",
+                "block_id": "file_input",
+                "label": {
+                    "type": "plain_text",
+                    "text": "Please attach 1-3 years P&L and/or taxes. Ideally, upload a spreadsheet with the P&Ls year-by-year all in one sheet.",
+                },
+                "element": {
+                    "type": "file_input",
+                    "action_id": "file_input",
+                    "filetypes": ["jpg", "png", "gif", "jpeg", "pdf"],
+                    "max_files": 5,
+                },
+                "hint": {
+                    "type": "plain_text",
+                    "text": "You can upload .png, .jpg, .jpeg, or .pdf files.",
+                },
+            }] if is_new_deal else []),
         {
             "type": "input",
             "block_id": "deal_calculator_ready",
@@ -1734,6 +1738,21 @@ def deal_closed_form_modal(
                 ),
                 "placeholder": {"type": "plain_text", "text": "Select an option"},
                 "options": businessindustryoptions,
+            },
+        },
+        {
+            "type": "input",
+            "block_id": "location",
+            "label": {"type": "plain_text", "text": "Location of the business"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "location",
+                **(
+                    {"initial_value": get_initial_value("location_of_the_business")}
+                    if "location_of_the_business" in deal_data
+                    and deal_data.get("location_of_the_business") is not None
+                    else {}
+                ),
             },
         },
         {

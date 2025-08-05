@@ -57,6 +57,7 @@ def create_closed_community_acquisition_record(
             "we_d_love_to_share_your_success_with_our_audience_on_socials__please_let_us_know_what__if_anything_": f"{data.get('success_share_checkboxes')}",
             "if_you_d_like_us_to_tag_you_on_socials__please_list_your_profile_name_s__here_": f"{data.get('success_share_text')}",
             "business_type_industry": f"{data.get('business_type')}",
+            "location_of_the_business": f"{data.get('location')}",
         }
     }
     url = "https://api.hubapi.com/crm/v3/objects/2-32622392"
@@ -141,9 +142,8 @@ def create_open_community_acquisition_record(
             "what_are_your_main_concerns_or_questions_": f"{data.get('concerns_questions')}",
             "user_id": f"{data.get('user_id')}",
             "submitted_by": f"{get_user_name(data.get('user_id')).get('real_name')}",
-            "please_attach_1_3_years_p_l_and_or_taxes__ideally__upload_a_spreadsheet_with_the_p_ls_year_by_year_": data.get(
-                "file_url"
-            ),
+            # Only include file data if it's provided (for new deals)
+            **({"please_attach_1_3_years_p_l_and_or_taxes__ideally__upload_a_spreadsheet_with_the_p_ls_year_by_year_": data.get("file_url")} if data.get("file_url") else {}),
             "company_name": f"{data.get('company_name', 'New Deal')}",
         }
     }

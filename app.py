@@ -305,6 +305,8 @@ def button():
                     "success_share_text"
                 ]["success_share_text"]["value"]
 
+            location =  data["view"]["state"]["values"]["location"]["location"]["value"]
+
             datatosend = {
                 "source": source,
                 "website": website,
@@ -328,6 +330,7 @@ def button():
                 "deal_stage": deal_stage,
                 "success_share_text": success_share_text,
                 "business_type": business_type,
+                "location": location,
             }
 
             if company_name is not None:
@@ -474,14 +477,16 @@ def button():
 
             file_urls = []
 
-            file_input = data["view"]["state"]["values"][f"file_input"][f"file_input"][
-                "files"
-            ]
-            for file in file_input:
-                try:
-                    file_urls.append(file)
-                except Exception as e:
-                    continue
+            # Only process file uploads for new deals
+            if deal_id is None:
+                file_input = data["view"]["state"]["values"][f"file_input"][f"file_input"][
+                    "files"
+                ]
+                for file in file_input:
+                    try:
+                        file_urls.append(file)
+                    except Exception as e:
+                        continue
 
             deal_calculator_ready = data["view"]["state"]["values"][
                 "deal_calculator_ready"
