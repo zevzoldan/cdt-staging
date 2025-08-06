@@ -1423,7 +1423,14 @@ def deal_review_form_modal(
 
     # Combine header and questions
     blocks = header + questionblocks
-
+    if deal_id:
+        blocks.append({
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "You've already uploaded your P&L file. If you'd like to update your deal review with an additional file, please respond to the original post in the Slack thread and attach it there."
+            }
+        })
     # Update Slack modal
     try:
         response = slack_client.views_update(
