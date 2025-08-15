@@ -366,6 +366,15 @@ def basic_deal_info_form(
             }
         return None
 
+
+    def initial_value_number(field):
+        if current_state.get(field) is not None:
+            return current_state.get(field)
+        elif deal_data.get(field) is not None:
+            return deal_data.get(field)
+        else:
+            return 0
+
     blocks = [
         {
             "type": "input",
@@ -428,10 +437,10 @@ def basic_deal_info_form(
             "label": {"type": "plain_text", "text": "What is the annual revenue?"},
             "element": {
                 "type": "number_input",
-                "is_decimal_allowed": False,
+                "is_decimal_allowed": True,
                 "action_id": "annual_revenue",
                 **(
-                    {"initial_value": get_initial_value("annual_revenue")}
+                    {"initial_value": initial_value_number("annual_revenue")}
                     if "annual_revenue" in deal_data
                     and deal_data.get("annual_revenue") is not None
                     else {}
@@ -599,7 +608,7 @@ def deal_review_form_modal(
 
     def get_initital_value_number(field):
         if deal_data.get(field):
-            return int(deal_data.get(field))
+            return float(deal_data.get(field))
         else:
             return 0
 
@@ -1070,7 +1079,7 @@ def deal_review_form_modal(
                 "action_id": "asking_price",
                 "is_decimal_allowed": False,
                 **(
-                    {"initial_value": get_initial_value("deal_purchase_price")}
+                    {"initial_value": get_initital_value_number("deal_purchase_price")}
                     if "deal_purchase_price" in deal_data
                     and deal_data.get("deal_purchase_price") is not None
                     else {}
