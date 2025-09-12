@@ -88,6 +88,15 @@ def send_deal_review_message(datatosend, slack_send_ts=None):
                     "style": "bullet",
                     "indent": 1,
                     "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "text": f"2025: {datatosend.get('sde_ebitda_2025')}",
+                                }
+                            ],
+                        },
                         {
                             "type": "rich_text_section",
                             "elements": [
@@ -142,6 +151,15 @@ def send_deal_review_message(datatosend, slack_send_ts=None):
                     "style": "bullet",
                     "indent": 1,
                     "elements": [
+                        {
+                            "type": "rich_text_section",
+                            "elements": [
+                                {
+                                    "type": "text",
+                                    "text": f"2025: {datatosend.get('revenue_2025')}",
+                                }
+                            ],
+                        },
                         {
                             "type": "rich_text_section",
                             "elements": [
