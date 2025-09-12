@@ -437,6 +437,12 @@ def button():
             sde_ebitda_2021 = data["view"]["state"]["values"]["sde_ebitda_2021"][
                 "sde_ebitda_2021"
             ]["value"]
+            sde_ebitda_2025 = data["view"]["state"]["values"]["sde_ebitda_2025"][
+                "sde_ebitda_2025"
+            ]["value"]
+            revenue_2025 = data["view"]["state"]["values"]["revenue_2025"][
+                "revenue_2025"
+            ]["value"]
             revenue_2024 = data["view"]["state"]["values"]["revenue_2024"][
                 "revenue_2024"
             ]["value"]
@@ -517,6 +523,8 @@ def button():
                 "sde_ebitda_2023": sde_ebitda_2023,
                 "sde_ebitda_2022": sde_ebitda_2022,
                 "sde_ebitda_2021": sde_ebitda_2021,
+                "sde_ebitda_2025": sde_ebitda_2025,
+                "revenue_2025": revenue_2025,
                 "revenue_2024": revenue_2024,
                 "revenue_2023": revenue_2023,
                 "revenue_2022": revenue_2022,

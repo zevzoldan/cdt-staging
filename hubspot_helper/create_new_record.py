@@ -117,10 +117,12 @@ def create_open_community_acquisition_record(
         "properties": {
             "company_name": f"{data.get('company_name')}",
             "are_you_willing_to_share_this_on_mnl_": f"{data.get('share_mnl')}",
+            "n2025_sde___ebitda": f"{data.get('sde_ebitda_2025')}",
             "n2024_sde___ebitda": f"{data.get('sde_ebitda_2024')}",
             "n2023_sde___ebitda": f"{data.get('sde_ebitda_2023')}",
             "n2022_sde___ebitda": f"{data.get('sde_ebitda_2022')}",
             "n2021_sde___ebitda": f"{data.get('sde_ebitda_2021')}",
+            "n2025_revenue": f"{data.get('revenue_2025')}",
             "n2024_revenue": f"{data.get('revenue_2024')}",
             "n2023_revenue": f"{data.get('revenue_2023')}",
             "n2022_revenue": f"{data.get('revenue_2022')}",

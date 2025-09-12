@@ -918,6 +918,25 @@ def deal_review_form_modal(
                 ],
             },
         },
+                {
+            "type": "input",
+            "block_id": "sde_ebitda_2025",
+            "label": {"type": "plain_text", "text": "2025 SDE / EBITDA"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "sde_ebitda_2025",
+                **(
+                    {"initial_value": get_initial_value("n2025_sde___ebitda")}
+                    if "n2025_sde___ebitda" in deal_data
+                    and deal_data.get("n2025_sde___ebitda") is not None
+                    else {}
+                ),
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Put NA if not available.",
+                },
+            },
+        },
         {
             "type": "input",
             "block_id": "sde_ebitda_2024",
@@ -937,6 +956,7 @@ def deal_review_form_modal(
                 },
             },
         },
+
         {
             "type": "input",
             "block_id": "sde_ebitda_2023",
@@ -986,6 +1006,25 @@ def deal_review_form_modal(
                     {"initial_value": get_initial_value("n2021_sde___ebitda")}
                     if "n2021_sde___ebitda" in deal_data
                     and deal_data.get("n2021_sde___ebitda") is not None
+                    else {}
+                ),
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Put NA if not available.",
+                },
+            },
+        },
+        {
+            "type": "input",
+            "block_id": "revenue_2025",
+            "label": {"type": "plain_text", "text": "2025 Revenue"},
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "revenue_2025",
+                **(
+                    {"initial_value": get_initial_value("n2025_revenue")}
+                    if "n2025_revenue" in deal_data
+                    and deal_data.get("n2025_revenue") is not None
                     else {}
                 ),
                 "placeholder": {
