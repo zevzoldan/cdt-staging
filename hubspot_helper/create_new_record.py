@@ -56,7 +56,7 @@ def create_closed_community_acquisition_record(
             "user_id": f"{data.get('user_id')}",
             "we_d_love_to_share_your_success_with_our_audience_on_socials__please_let_us_know_what__if_anything_": f"{data.get('success_share_checkboxes')}",
             "if_you_d_like_us_to_tag_you_on_socials__please_list_your_profile_name_s__here_": f"{data.get('success_share_text')}",
-            "business_type_industry": f"{data.get('business_type')}",
+            "business_type_industry": "Service Businesses - Commercial Laundry / Laundromats and Coin" if data.get('business_type') == "Service Businesses - Commercial Laundry / Laundromats and Coin Laundry" else f"{data.get('business_type')}",
             "location_of_the_business": f"{data.get('location')}",
         }
     }
@@ -131,7 +131,7 @@ def create_open_community_acquisition_record(
             "are_you_providing_sde_or_ebitda_for_earnings___please_specify_which_one_": f"{data.get('earnings_type').upper()}",
             "deal_purchase_price": f"{int(data.get('asking_price'))}",
             "deal_name___description": f"{data.get('business_description')}",
-            "business_type_industry": f"{data.get('business_type')}",
+            "business_type_industry": "Service Businesses - Commercial Laundry / Laundromats and Coin" if data.get('business_type') == "Service Businesses - Commercial Laundry / Laundromats and Coin Laundry" else f"{data.get('business_type')}",
             "deal_stage": f"{data.get('deal_stage')}",
             "how_much_of_the_purchase_price_is_for_real_estate_": f"{data.get('real_estate_percentage')}",
             "link_to_your_deal_calculator": f"{data.get('deal_calculator_link')}",
