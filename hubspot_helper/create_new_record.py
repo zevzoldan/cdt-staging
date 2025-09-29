@@ -6,6 +6,7 @@ from helpers import get_user_name
 from dotenv import load_dotenv
 from hubspot_helper.query import get_contact_id
 from hubspot_helper.submission_processor import helper__send_error_data
+from hubspot_helper.slack_logger import log_hubspot_update
 
 load_dotenv()
 
@@ -29,7 +30,9 @@ def get_headers() -> Dict[str, str]:
 
 def create_closed_community_acquisition_record(
     data: Dict[str, Any], deal_id: Optional[str] = None
-):
+) -> Optional[str]:
+    # Get thread_ts from data for Slack logging
+    thread_ts = data.get("slack_thread_ts")
 
     headers = get_headers()
     payload = {
@@ -63,6 +66,7 @@ def create_closed_community_acquisition_record(
     url = "https://api.hubapi.com/crm/v3/objects/2-32622392"
 
     print("handling closed deal in HS")
+    slack_thread_ts = data.get("slack_thread_ts")
     if deal_id is None:
         try:
             response = requests.post(
@@ -70,9 +74,13 @@ def create_closed_community_acquisition_record(
                 headers=headers,
                 json=payload,
             )
-            print("creating new deal in HS", response.json())
+            result = response.json()
+            print("creating new deal in HS", result)
+            log_hubspot_update("Create Deal", response.status_code, result, thread_ts=thread_ts)
         except Exception as e:
-            print(f"Error creating deal: {e}")
+            error_msg = f"Error creating deal: {e}"
+            print(error_msg)
+            log_hubspot_update("Create Deal", 500, payload, error=error_msg, thread_ts=thread_ts)
             helper__send_error_data(e, payload, deal_id)
             return None
 
@@ -85,12 +93,14 @@ def create_closed_community_acquisition_record(
                 headers=headers,
                 json=payload,
             )
-            print("updating existing deal in HS", deal_id, response.json())
+            result = response.json()
+            print("updating existing deal in HS", deal_id, result)
+            thread_ts = log_hubspot_update("Update Deal", response.status_code, result, thread_ts=thread_ts)
         except Exception as e:
-            print(f"Error updating deal: {e}")
-
+            error_msg = f"Error updating deal: {e}"
+            print(error_msg)
+            log_hubspot_update("Update Deal", 500, payload, error=error_msg, thread_ts=thread_ts)
             helper__send_error_data(e, payload, deal_id)
-
             return None
 
     deal_id = response.json().get("id")
@@ -100,10 +110,10 @@ def create_closed_community_acquisition_record(
         contact_id = get_contact_id(data.get("user_id"))
         if contact_id is None:
             print("creating new contact record")
-            contact_id = create_new_contact_record(data.get("user_id"))
+            contact_id = create_new_contact_record(data.get("user_id"), thread_ts=thread_ts)
         if contact_id:
             print("associating deal with contact", contact_id)
-            associate_deal_with_contact(deal_id, contact_id)
+            associate_deal_with_contact(deal_id, contact_id, thread_ts=thread_ts)
 
             # TODO Update contact address
             update_contact_address(contact_id, data.get("mailing_address"))
@@ -111,7 +121,9 @@ def create_closed_community_acquisition_record(
 
 def create_open_community_acquisition_record(
     data: Dict[str, Any], deal_id: Optional[str] = None
-):
+) -> Optional[str]:
+    # Get thread_ts from data for Slack logging
+    thread_ts = data.get("slack_thread_ts")
     headers = get_headers()
     payload = {
         "properties": {
@@ -157,8 +169,12 @@ def create_open_community_acquisition_record(
                     headers=headers,
                     json=payload,
                 )
+                result = response.json()
+                log_hubspot_update("Create Deal", response.status_code, result, thread_ts=thread_ts)
             except Exception as e:
-                print(f"Error creating deal: {e}")
+                error_msg = f"Error creating deal: {e}"
+                print(error_msg)
+                log_hubspot_update("Create Deal", 500, payload, error=error_msg, thread_ts=thread_ts)
                 helper__send_error_data(e, payload, deal_id)
                 return None
 
@@ -169,8 +185,12 @@ def create_open_community_acquisition_record(
                     headers=headers,
                     json=payload,
                 )
+                result = response.json()
+                log_hubspot_update("Update Deal", response.status_code, result, thread_ts=thread_ts)
             except Exception as e:
-                print(f"Error updating deal: {e}")
+                error_msg = f"Error updating deal: {e}"
+                print(error_msg)
+                log_hubspot_update("Update Deal", 500, payload, error=error_msg, thread_ts=thread_ts)
                 helper__send_error_data(e, payload, deal_id)
                 return None
 
@@ -192,9 +212,9 @@ def create_open_community_acquisition_record(
         if deal_id:
             contact_id = get_contact_id(data.get("user_id"))
             if contact_id is None:
-                contact_id = create_new_contact_record(data.get("user_id"))
+                contact_id = create_new_contact_record(data.get("user_id"), thread_ts)
             if contact_id:
-                associate_deal_with_contact(deal_id, contact_id)
+                associate_deal_with_contact(deal_id, contact_id, thread_ts)
     except Exception as e:
         print(f"Error associating deal with contact: {e}")
         # Continue even if association fails, still return the deal_id
@@ -202,19 +222,23 @@ def create_open_community_acquisition_record(
     return deal_id
 
 
-def associate_deal_with_contact(deal_id: str, contact_id: str):
+def associate_deal_with_contact(deal_id: str, contact_id: str, thread_ts: Optional[str] = None):
     headers = get_headers()
     data = '[ { "associationCategory": "USER_DEFINED", "associationTypeId": 81 } ]'
     url = f"https://api.hubapi.com/crm/v4/objects/2-32622392/{deal_id}/associations/contacts/{contact_id}"
     try:
         response = requests.put(url, headers=headers, data=data)
-        print(response.json())
+        result = response.json()
+        print(result)
+        log_hubspot_update("Associate Deal with Contact", response.status_code, result, thread_ts=thread_ts)
     except Exception as e:
-        print(f"Error associating deal with contact: {e}")
+        error_msg = f"Error associating deal with contact: {e}"
+        print(error_msg)
+        log_hubspot_update("Associate Deal with Contact", 500, {"deal_id": deal_id, "contact_id": contact_id}, error=error_msg, thread_ts=thread_ts)
         return None
 
 
-def create_new_contact_record(user_id: str) -> Optional[str]:
+def create_new_contact_record(user_id: str, thread_ts: Optional[str] = None) -> Optional[str]:
     user_info = get_user_name(user_id)
     first_name = user_info.get("profile").get("first_name")
     last_name = user_info.get("profile").get("last_name")
@@ -232,13 +256,18 @@ def create_new_contact_record(user_id: str) -> Optional[str]:
     try:
         url = f"https://api.hubapi.com/crm/v3/objects/contacts"
         response = requests.post(url, headers=headers, json=payload)
+        result = response.json()
         if response.status_code == 200 or response.status_code == 201:
-            contact_id = response.json().get("id")
+            log_hubspot_update("Create Contact", response.status_code, result, thread_ts=thread_ts)
+            contact_id = result.get("id")
             return contact_id
         else:
+            log_hubspot_update("Create Contact", response.status_code, result, error="Failed to create contact", thread_ts=thread_ts)
             return None
     except Exception as e:
-        print(f"Error creating contact record: {e}")
+        error_msg = f"Error creating contact record: {e}"
+        print(error_msg)
+        log_hubspot_update("Create Contact", 500, payload, error=error_msg, thread_ts=thread_ts)
         return None
 
 

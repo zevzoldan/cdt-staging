@@ -8,8 +8,11 @@ from datetime import datetime
 import json
 import os
 from pprint import pprint
+import requests
 from slack_sdk import WebClient
 from dotenv import load_dotenv
+
+# Industry options are now loaded dynamically from the /industry_options endpoint
 
 from hubspot_helper.query import (
     deal_data_from_hubspot,
@@ -228,126 +231,24 @@ def basic_deal_info_form(
     # - Annual SDE
     deal_data = {}
 
-    dictofoptions = {
-        "Agriculture - Cannabis Businesses": "Agriculture - Cannabis Businesses",
-        "Agriculture - Greenhouses / Tree Farms / Orchards": "Agriculture - Greenhouses / Tree Farms / Orchards",
-        "Agriculture - Other": "Agriculture - Other",
-        "Automotive and Boat - Auto Repair and Service Shops": "Automotive and Boat - Auto Repair and Service Shops",
-        "Automotive and Boat - Car Dealerships / Motorcycle Businesses": "Automotive and Boat - Car Dealerships / Motorcycle Businesses",
-        "Automotive and Boat - Car Washes": "Automotive and Boat - Car Washes",
-        "Automotive and Boat - Equipment Rental and Dealers": "Automotive and Boat - Equipment Rental and Dealers",
-        "Automotive and Boat - Gas Stations": "Automotive and Boat - Gas Stations",
-        "Automotive and Boat - Other": "Automotive and Boat - Other",
-        "Automotive and Boat - Towing Companies": "Automotive and Boat - Towing Companies",
-        "Beauty and Personal Care - Beauty Salons / Barber Shops": "Beauty and Personal Care - Beauty Salons / Barber Shops",
-        "Beauty and Personal Care - Massage / Spas": "Beauty and Personal Care - Massage / Spas",
-        "Building and Construction - Building Material and Hardware Stores": "Building and Construction - Building Material and Hardware Stores",
-        "Building and Construction - Carpet and Flooring Businesses": "Building and Construction - Carpet and Flooring Businesses",
-        "Building and Construction - Concrete": "Building and Construction - Concrete",
-        "Building and Construction - Electrical and Mechanical": "Building and Construction - Electrical and Mechanical",
-        "Building and Construction - Fencing Businesses": "Building and Construction - Fencing Businesses",
-        "Building and Construction - Heavy Construction": "Building and Construction - Heavy Construction",
-        "Building and Construction - HVAC / Plumbing Businesses": "Building and Construction - HVAC / Plumbing Businesses",
-        "Building and Construction - Painting Businesses": "Building and Construction - Painting Businesses",
-        "Building and Construction - Roofing Business": "Building and Construction - Roofing Business",
-        "Communication and Media - Magazines and Newspapers": "Communication and Media - Magazines and Newspapers",
-        "Education and Children - Day Care and Child Care Centers": "Education and Children - Day Care and Child Care Centers",
-        "Education and Children - Schools / Preschools": "Education and Children - Schools / Preschools",
-        "Entertainment and Recreation - Services & Facilities": "Entertainment and Recreation - Services & Facilities",
-        "Entertainment and Recreation - Other": "Entertainment and Recreation - Other",
-        "Entertainment and Recreation - Outdoor Adventure Business": "Entertainment and Recreation - Outdoor Adventure Business",
-        "Financial Services - Accounting and Tax Practices": "Financial Services - Accounting and Tax Practices",
-        "Financial Services - Banking / Loans": "Financial Services - Banking / Loans",
-        "Financial Services - Check Cashing": "Financial Services - Check Cashing",
-        "Financial Services - Insurance Agencies": "Financial Services - Insurance Agencies",
-        "Health Care & Fitness - Assisted Living / Nursing Homes / Home Health Care": "Health Care & Fitness - Assisted Living / Nursing Homes / Home Health Care",
-        "Health Care & Fitness - Chiropractic Practices": "Health Care & Fitness - Chiropractic Practices",
-        "Health Care & Fitness - Cosmetic Medical, Surgery & Med Spa": "Health Care & Fitness - Cosmetic Medical, Surgery & Med Spa",
-        "Health Care & Fitness - Dance, Pilates and Yoga": "Health Care & Fitness - Dance, Pilates and Yoga",
-        "Health Care & Fitness - Dental Practices": "Health Care & Fitness - Dental Practices",
-        "Health Care & Fitness - Gyms and Fitness Centers": "Health Care & Fitness - Gyms and Fitness Centers",
-        "Health Care & Fitness - Medical Practices": "Health Care & Fitness - Medical Practices",
-        "Health Care & Fitness - Medical Transportation Businesses": "Health Care & Fitness - Medical Transportation Businesses",
-        "Health Care & Fitness - Physical Therapy Practices": "Health Care & Fitness - Physical Therapy Practices",
-        "Manufacturing - Clothing and Fabric": "Manufacturing - Clothing and Fabric",
-        "Manufacturing - Food and Related products": "Manufacturing - Food and Related products",
-        "Manufacturing - Furniture and Fixtures": "Manufacturing - Furniture and Fixtures",
-        "Manufacturing - Lumber and Wood Products": "Manufacturing - Lumber and Wood Products",
-        "Manufacturing - Other": "Manufacturing - Other",
-        "Manufacturing - Packaging": "Manufacturing - Packaging",
-        "Manufacturing - Paper / Printing": "Manufacturing - Paper / Printing",
-        "Manufacturing - Sign Manufacturers": "Manufacturing - Sign Manufacturers",
-        "Online & Technology - Cell Phone and Computer Repair and Services": "Online & Technology - Cell Phone and Computer Repair and Services",
-        "Online & Technology - E-Commerce Stores": "Online & Technology - E-Commerce Stores",
-        "Online & Technology - Graphic / Websites / Web Design": "Online & Technology - Graphic / Websites / Web Design",
-        "Online & Technology - IT / Software / SaaS Businesses": "Online & Technology - IT / Software / SaaS Businesses",
-        "Other - All Non-Classifiable Businesses": "Other - All Non-Classifiable Businesses",
-        "Pet Services - Daycare, Boarding, Grooming / Pet Store and Supplies": "Pet Services - Daycare, Boarding, Grooming / Pet Store and Supplies",
-        "Pet Services - Veterinary Practices": "Pet Services - Veterinary Practices",
-        "Restaurants and Food - Bakeries / Donut Shops ": "Restaurants and Food - Bakeries / Donut Shops",
-        "Restaurants and Food - Bars, Pubs and Taverns": "Restaurants and Food - Bars, Pubs and Taverns",
-        "Restaurants and Food - Breweries / Distilleries": "Restaurants and Food - Breweries / Distilleries",
-        "Restaurants and Food - Delis and Sandwich Shops": "Restaurants and Food - Delis and Sandwich Shops",
-        "Restaurants and Food - Food Trucks": "Restaurants and Food - Food Trucks",
-        "Restaurants + Food - Diners, Fast Food, Cafes, Coffee, Ice Cream": "Restaurants + Food - Diners, Fast Food, Cafes, Coffee, Ice Cream",
-        "Retail - Beauty Supply Stores": "Retail - Beauty Supply Stores",
-        "Retail - Bike Shops": "Retail - Bike Shops",
-        "Retail - Clothing and Accessory Stores": "Retail - Clothing and Accessory Stores",
-        "Retail - Convenience Stores": "Retail - Convenience Stores",
-        "Retail - Flower Shops": "Retail - Flower Shops",
-        "Retail - Furniture and Furnishings Stores / Antique Shops": "Retail - Furniture and Furnishings Stores / Antique Shops",
-        "Retail - Grocery Stores and Supermarkets": "Retail - Grocery Stores and Supermarkets",
-        "Retail - Jewelry Stores / Pawn Shops": "Retail - Jewelry Stores / Pawn Shops",
-        "Retail - Liquor Stores": "Retail - Liquor Stores",
-        "Retail - Other": "Retail - Other",
-        "Retail - Pharmacies / Health Food and Nutrition": "Retail - Pharmacies / Health Food and Nutrition",
-        "Retail - Sporting Goods Stores and Shooting Ranges": "Retail - Sporting Goods Stores and Shooting Ranges",
-        "Retail - Vending Machines": "Retail - Vending Machines",
-        "Service Businesses - Amazon / Fedex / UPS Stores / Shipping Routes": "Service Businesses - Amazon / Fedex / UPS Stores / Shipping Routes",
-        "Service Businesses - Catering Companies": "Service Businesses - Catering Companies",
-        "Service Businesses - Cleaning Businesses": "Service Businesses - Cleaning Businesses",
-        "Service Businesses - Commercial Laundry / Laundromats and Coin Laundry": "Service Businesses - Commercial Laundry / Laundromats and Coin Laundry",
-        "Service Businesses - Consulting Businesses": "Service Businesses - Consulting Businesses",
-        "Service Businesses - Dry Cleaners": "Service Businesses - Dry Cleaners",
-        "Service Businesses - Event Planning Businesses": "Service Businesses - Event Planning Businesses",
-        "Service Businesses - Funeral Homes": "Service Businesses - Funeral Homes",
-        "Service Businesses - Landscaping and Yard Services": "Service Businesses - Landscaping and Yard Services",
-        "Service Businesses - Locksmith": "Service Businesses - Locksmith",
-        "Service Businesses - Marketing and Advertising Businesses": "Service Businesses - Marketing and Advertising Businesses",
-        "Service Businesses - Other": "Service Businesses - Other",
-        "Service Businesses - Pest Control": "Service Businesses - Pest Control",
-        "Service Businesses - Photography Businesses": "Service Businesses - Photography Businesses",
-        "Service Businesses - Property Management": "Service Businesses - Property Management",
-        "Service Businesses - Security": "Service Businesses - Security",
-        "Service Businesses - Staffing Agencies": "Service Businesses - Staffing Agencies",
-        "Service Businesses - Tutoring Businesses": "Service Businesses - Tutoring Businesses",
-        "Service Businesses - Water Businesses and Stores": "Service Businesses - Water Businesses and Stores",
-        "Transportation and Storage - Limo and Passenger Transportation": "Transportation and Storage - Limo and Passenger Transportation",
-        "Transportation and Storage - Moving and Shipping": "Transportation and Storage - Moving and Shipping",
-        "Transportation and Storage - Storage Facilities and Warehouses": "Transportation and Storage - Storage Facilities and Warehouses",
-        "Travel - Campgrounds / RV Parks / Mobile Home Parks": "Travel - Campgrounds / RV Parks / Mobile Home Parks",
-        "Travel - Hotels / Motels / Bed & Breakfast": "Travel - Hotels / Motels / Bed & Breakfast",
-        "Travel - Travel Agencies": "Travel - Travel Agencies",
-        "Wholesale and Distributors - Durable / Nondurable Goods": "Wholesale and Distributors - Durable / Nondurable Goods",
-    }
 
     businessindustryoptions = []
     if deal_id:
         print("deal id is ", deal_id)
-
         deal_data = deal_data_from_hubspot(deal_id)  # Fetch data from HubSpot
         print(len(deal_data))
-    for key, value in dictofoptions.items():
-        # which key is over 75 characters
-        if len(key) > 75:
-            print("key is over 75 characters", key)
-        key = key[:75]  # Ensure keys are <= 75 characters
-        businessindustryoptions.append(
-            {
-                "text": {"type": "plain_text", "text": str(key)},
-                "value": str(value),
-            }
-        )
+    
+    # Get industry options from the endpoint
+    try:
+        response = requests.get(f"{os.environ['API_URL']}/industry_options")
+        if response.status_code == 200:
+            businessindustryoptions = response.json()["options"]
+        else:
+            print(f"Error fetching industry options: {response.status_code}")
+            businessindustryoptions = []
+    except Exception as e:
+        print(f"Error fetching industry options: {e}")
+        businessindustryoptions = []
 
     def get_initial_value(field):
         print(deal_data.get(field))
@@ -660,120 +561,31 @@ def deal_review_form_modal(
 
     # Industry Options
     businessindustryoptions = []
+    
+    # Get industry options from the endpoint
+    try:
+        response = requests.get(f"{os.environ['API_URL']}/industry_options")
+        if response.status_code == 200:
+            businessindustryoptions = response.json()["options"]
+        else:
+            print(f"Error fetching industry options: {response.status_code}")
+            businessindustryoptions = []
+    except Exception as e:
+        print(f"Error fetching industry options: {e}")
+        businessindustryoptions = []
+       
 
-    dictofoptions = {
-        "Agriculture - Cannabis Businesses": "Agriculture - Cannabis Businesses",
-        "Agriculture - Greenhouses / Tree Farms / Orchards": "Agriculture - Greenhouses / Tree Farms / Orchards",
-        "Agriculture - Other": "Agriculture - Other",
-        "Automotive and Boat - Auto Repair and Service Shops": "Automotive and Boat - Auto Repair and Service Shops",
-        "Automotive and Boat - Car Dealerships / Motorcycle Businesses": "Automotive and Boat - Car Dealerships / Motorcycle Businesses",
-        "Automotive and Boat - Car Washes": "Automotive and Boat - Car Washes",
-        "Automotive and Boat - Equipment Rental and Dealers": "Automotive and Boat - Equipment Rental and Dealers",
-        "Automotive and Boat - Gas Stations": "Automotive and Boat - Gas Stations",
-        "Automotive and Boat - Other": "Automotive and Boat - Other",
-        "Automotive and Boat - Towing Companies": "Automotive and Boat - Towing Companies",
-        "Beauty and Personal Care - Beauty Salons / Barber Shops": "Beauty and Personal Care - Beauty Salons / Barber Shops",
-        "Beauty and Personal Care - Massage / Spas": "Beauty and Personal Care - Massage / Spas",
-        "Building and Construction - Building Material and Hardware Stores": "Building and Construction - Building Material and Hardware Stores",
-        "Building and Construction - Carpet and Flooring Businesses": "Building and Construction - Carpet and Flooring Businesses",
-        "Building and Construction - Concrete": "Building and Construction - Concrete",
-        "Building and Construction - Electrical and Mechanical": "Building and Construction - Electrical and Mechanical",
-        "Building and Construction - Fencing Businesses": "Building and Construction - Fencing Businesses",
-        "Building and Construction - Heavy Construction": "Building and Construction - Heavy Construction",
-        "Building and Construction - HVAC / Plumbing Businesses": "Building and Construction - HVAC / Plumbing Businesses",
-        "Building and Construction - Painting Businesses": "Building and Construction - Painting Businesses",
-        "Building and Construction - Roofing Business": "Building and Construction - Roofing Business",
-        "Communication and Media - Magazines and Newspapers": "Communication and Media - Magazines and Newspapers",
-        "Education and Children - Day Care and Child Care Centers": "Education and Children - Day Care and Child Care Centers",
-        "Education and Children - Schools / Preschools": "Education and Children - Schools / Preschools",
-        "Entertainment and Recreation - Services & Facilities": "Entertainment and Recreation - Services & Facilities",
-        "Entertainment and Recreation - Other": "Entertainment and Recreation - Other",
-        "Entertainment and Recreation - Outdoor Adventure Business": "Entertainment and Recreation - Outdoor Adventure Business",
-        "Financial Services - Accounting and Tax Practices": "Financial Services - Accounting and Tax Practices",
-        "Financial Services - Banking / Loans": "Financial Services - Banking / Loans",
-        "Financial Services - Check Cashing": "Financial Services - Check Cashing",
-        "Financial Services - Insurance Agencies": "Financial Services - Insurance Agencies",
-        "Health Care & Fitness - Assisted Living / Nursing Homes / Home Health Care": "Health Care & Fitness - Assisted Living / Nursing Homes / Home Health Care",
-        "Health Care & Fitness - Chiropractic Practices": "Health Care & Fitness - Chiropractic Practices",
-        "Health Care & Fitness - Cosmetic Medical, Surgery & Med Spa": "Health Care & Fitness - Cosmetic Medical, Surgery & Med Spa",
-        "Health Care & Fitness - Dance, Pilates and Yoga": "Health Care & Fitness - Dance, Pilates and Yoga",
-        "Health Care & Fitness - Dental Practices": "Health Care & Fitness - Dental Practices",
-        "Health Care & Fitness - Gyms and Fitness Centers": "Health Care & Fitness - Gyms and Fitness Centers",
-        "Health Care & Fitness - Medical Practices": "Health Care & Fitness - Medical Practices",
-        "Health Care & Fitness - Medical Transportation Businesses": "Health Care & Fitness - Medical Transportation Businesses",
-        "Health Care & Fitness - Physical Therapy Practices": "Health Care & Fitness - Physical Therapy Practices",
-        "Manufacturing - Clothing and Fabric": "Manufacturing - Clothing and Fabric",
-        "Manufacturing - Food and Related products": "Manufacturing - Food and Related products",
-        "Manufacturing - Furniture and Fixtures": "Manufacturing - Furniture and Fixtures",
-        "Manufacturing - Lumber and Wood Products": "Manufacturing - Lumber and Wood Products",
-        "Manufacturing - Other": "Manufacturing - Other",
-        "Manufacturing - Packaging": "Manufacturing - Packaging",
-        "Manufacturing - Paper / Printing": "Manufacturing - Paper / Printing",
-        "Manufacturing - Sign Manufacturers": "Manufacturing - Sign Manufacturers",
-        "Online & Technology - Cell Phone and Computer Repair and Services": "Online & Technology - Cell Phone and Computer Repair and Services",
-        "Online & Technology - E-Commerce Stores": "Online & Technology - E-Commerce Stores",
-        "Online & Technology - Graphic / Websites / Web Design": "Online & Technology - Graphic / Websites / Web Design",
-        "Online & Technology - IT / Software / SaaS Businesses": "Online & Technology - IT / Software / SaaS Businesses",
-        "Other - All Non-Classifiable Businesses": "Other - All Non-Classifiable Businesses",
-        "Pet Services - Daycare, Boarding, Grooming / Pet Store and Supplies": "Pet Services - Daycare, Boarding, Grooming / Pet Store and Supplies",
-        "Pet Services - Veterinary Practices": "Pet Services - Veterinary Practices",
-        "Restaurants and Food - Bakeries / Donut Shops ": "Restaurants and Food - Bakeries / Donut Shops",
-        "Restaurants and Food - Bars, Pubs and Taverns": "Restaurants and Food - Bars, Pubs and Taverns",
-        "Restaurants and Food - Breweries / Distilleries": "Restaurants and Food - Breweries / Distilleries",
-        "Restaurants and Food - Delis and Sandwich Shops": "Restaurants and Food - Delis and Sandwich Shops",
-        "Restaurants and Food - Food Trucks": "Restaurants and Food - Food Trucks",
-        "Restaurants + Food - Diners, Fast Food, Cafes, Coffee, Ice Cream": "Restaurants + Food - Diners, Fast Food, Cafes, Coffee, Ice Cream",
-        "Retail - Beauty Supply Stores": "Retail - Beauty Supply Stores",
-        "Retail - Bike Shops": "Retail - Bike Shops",
-        "Retail - Clothing and Accessory Stores": "Retail - Clothing and Accessory Stores",
-        "Retail - Convenience Stores": "Retail - Convenience Stores",
-        "Retail - Flower Shops": "Retail - Flower Shops",
-        "Retail - Furniture and Furnishings Stores / Antique Shops": "Retail - Furniture and Furnishings Stores / Antique Shops",
-        "Retail - Grocery Stores and Supermarkets": "Retail - Grocery Stores and Supermarkets",
-        "Retail - Jewelry Stores / Pawn Shops": "Retail - Jewelry Stores / Pawn Shops",
-        "Retail - Liquor Stores": "Retail - Liquor Stores",
-        "Retail - Other": "Retail - Other",
-        "Retail - Pharmacies / Health Food and Nutrition": "Retail - Pharmacies / Health Food and Nutrition",
-        "Retail - Sporting Goods Stores and Shooting Ranges": "Retail - Sporting Goods Stores and Shooting Ranges",
-        "Retail - Vending Machines": "Retail - Vending Machines",
-        "Service Businesses - Amazon / Fedex / UPS Stores / Shipping Routes": "Service Businesses - Amazon / Fedex / UPS Stores / Shipping Routes",
-        "Service Businesses - Catering Companies": "Service Businesses - Catering Companies",
-        "Service Businesses - Cleaning Businesses": "Service Businesses - Cleaning Businesses",
-        "Service Businesses - Commercial Laundry / Laundromats and Coin Laundry": "Service Businesses - Commercial Laundry / Laundromats and Coin Laundry",
-        "Service Businesses - Consulting Businesses": "Service Businesses - Consulting Businesses",
-        "Service Businesses - Dry Cleaners": "Service Businesses - Dry Cleaners",
-        "Service Businesses - Event Planning Businesses": "Service Businesses - Event Planning Businesses",
-        "Service Businesses - Funeral Homes": "Service Businesses - Funeral Homes",
-        "Service Businesses - Landscaping and Yard Services": "Service Businesses - Landscaping and Yard Services",
-        "Service Businesses - Locksmith": "Service Businesses - Locksmith",
-        "Service Businesses - Marketing and Advertising Businesses": "Service Businesses - Marketing and Advertising Businesses",
-        "Service Businesses - Other": "Service Businesses - Other",
-        "Service Businesses - Pest Control": "Service Businesses - Pest Control",
-        "Service Businesses - Photography Businesses": "Service Businesses - Photography Businesses",
-        "Service Businesses - Property Management": "Service Businesses - Property Management",
-        "Service Businesses - Security": "Service Businesses - Security",
-        "Service Businesses - Staffing Agencies": "Service Businesses - Staffing Agencies",
-        "Service Businesses - Tutoring Businesses": "Service Businesses - Tutoring Businesses",
-        "Service Businesses - Water Businesses and Stores": "Service Businesses - Water Businesses and Stores",
-        "Transportation and Storage - Limo and Passenger Transportation": "Transportation and Storage - Limo and Passenger Transportation",
-        "Transportation and Storage - Moving and Shipping": "Transportation and Storage - Moving and Shipping",
-        "Transportation and Storage - Storage Facilities and Warehouses": "Transportation and Storage - Storage Facilities and Warehouses",
-        "Travel - Campgrounds / RV Parks / Mobile Home Parks": "Travel - Campgrounds / RV Parks / Mobile Home Parks",
-        "Travel - Hotels / Motels / Bed & Breakfast": "Travel - Hotels / Motels / Bed & Breakfast",
-        "Travel - Travel Agencies": "Travel - Travel Agencies",
-        "Wholesale and Distributors - Durable / Nondurable Goods": "Wholesale and Distributors - Durable / Nondurable Goods",
-    }
-
-    for key, value in dictofoptions.items():
-        if len(key) > 75:
-            print("key is over 75 characters", key)
-        key = key[:75]  # Ensure keys are <= 75 characters
-        businessindustryoptions.append(
-            {
-                "text": {"type": "plain_text", "text": str(key)},
-                "value": str(value),
-            }
-        )
+    # Get industry options from the endpoint
+    try:
+        response = requests.get(f"{os.environ['API_URL']}/industry_options")
+        if response.status_code == 200:
+            businessindustryoptions = response.json()["options"]
+        else:
+            print(f"Error fetching industry options: {response.status_code}")
+            businessindustryoptions = []
+    except Exception as e:
+        print(f"Error fetching industry options: {e}")
+        businessindustryoptions = []
 
     # Form Fields
     # Check if this is a new deal or updating an existing deal
@@ -1615,122 +1427,21 @@ def deal_closed_form_modal(
             }
         return None
 
-    dictofoptions = {
-        "Agriculture - Cannabis Businesses": "Agriculture - Cannabis Businesses",
-        "Agriculture - Greenhouses / Tree Farms / Orchards": "Agriculture - Greenhouses / Tree Farms / Orchards",
-        "Agriculture - Other": "Agriculture - Other",
-        "Automotive and Boat - Auto Repair and Service Shops": "Automotive and Boat - Auto Repair and Service Shops",
-        "Automotive and Boat - Car Dealerships / Motorcycle Businesses": "Automotive and Boat - Car Dealerships / Motorcycle Businesses",
-        "Automotive and Boat - Car Washes": "Automotive and Boat - Car Washes",
-        "Automotive and Boat - Equipment Rental and Dealers": "Automotive and Boat - Equipment Rental and Dealers",
-        "Automotive and Boat - Gas Stations": "Automotive and Boat - Gas Stations",
-        "Automotive and Boat - Other": "Automotive and Boat - Other",
-        "Automotive and Boat - Towing Companies": "Automotive and Boat - Towing Companies",
-        "Beauty and Personal Care - Beauty Salons / Barber Shops": "Beauty and Personal Care - Beauty Salons / Barber Shops",
-        "Beauty and Personal Care - Massage / Spas": "Beauty and Personal Care - Massage / Spas",
-        "Building and Construction - Building Material and Hardware Stores": "Building and Construction - Building Material and Hardware Stores",
-        "Building and Construction - Carpet and Flooring Businesses": "Building and Construction - Carpet and Flooring Businesses",
-        "Building and Construction - Concrete": "Building and Construction - Concrete",
-        "Building and Construction - Electrical and Mechanical": "Building and Construction - Electrical and Mechanical",
-        "Building and Construction - Fencing Businesses": "Building and Construction - Fencing Businesses",
-        "Building and Construction - Heavy Construction": "Building and Construction - Heavy Construction",
-        "Building and Construction - HVAC / Plumbing Businesses": "Building and Construction - HVAC / Plumbing Businesses",
-        "Building and Construction - Painting Businesses": "Building and Construction - Painting Businesses",
-        "Building and Construction - Roofing Business": "Building and Construction - Roofing Business",
-        "Communication and Media - Magazines and Newspapers": "Communication and Media - Magazines and Newspapers",
-        "Education and Children - Day Care and Child Care Centers": "Education and Children - Day Care and Child Care Centers",
-        "Education and Children - Schools / Preschools": "Education and Children - Schools / Preschools",
-        "Entertainment and Recreation - Services & Facilities": "Entertainment and Recreation - Services & Facilities",
-        "Entertainment and Recreation - Other": "Entertainment and Recreation - Other",
-        "Entertainment and Recreation - Outdoor Adventure Business": "Entertainment and Recreation - Outdoor Adventure Business",
-        "Financial Services - Accounting and Tax Practices": "Financial Services - Accounting and Tax Practices",
-        "Financial Services - Banking / Loans": "Financial Services - Banking / Loans",
-        "Financial Services - Check Cashing": "Financial Services - Check Cashing",
-        "Financial Services - Insurance Agencies": "Financial Services - Insurance Agencies",
-        "Health Care & Fitness - Assisted Living / Nursing Homes / Home Health Care": "Health Care & Fitness - Assisted Living / Nursing Homes / Home Health Care",
-        "Health Care & Fitness - Chiropractic Practices": "Health Care & Fitness - Chiropractic Practices",
-        "Health Care & Fitness - Cosmetic Medical, Surgery & Med Spa": "Health Care & Fitness - Cosmetic Medical, Surgery & Med Spa",
-        "Health Care & Fitness - Dance, Pilates and Yoga": "Health Care & Fitness - Dance, Pilates and Yoga",
-        "Health Care & Fitness - Dental Practices": "Health Care & Fitness - Dental Practices",
-        "Health Care & Fitness - Gyms and Fitness Centers": "Health Care & Fitness - Gyms and Fitness Centers",
-        "Health Care & Fitness - Medical Practices": "Health Care & Fitness - Medical Practices",
-        "Health Care & Fitness - Medical Transportation Businesses": "Health Care & Fitness - Medical Transportation Businesses",
-        "Health Care & Fitness - Physical Therapy Practices": "Health Care & Fitness - Physical Therapy Practices",
-        "Manufacturing - Clothing and Fabric": "Manufacturing - Clothing and Fabric",
-        "Manufacturing - Food and Related products": "Manufacturing - Food and Related products",
-        "Manufacturing - Furniture and Fixtures": "Manufacturing - Furniture and Fixtures",
-        "Manufacturing - Lumber and Wood Products": "Manufacturing - Lumber and Wood Products",
-        "Manufacturing - Other": "Manufacturing - Other",
-        "Manufacturing - Packaging": "Manufacturing - Packaging",
-        "Manufacturing - Paper / Printing": "Manufacturing - Paper / Printing",
-        "Manufacturing - Sign Manufacturers": "Manufacturing - Sign Manufacturers",
-        "Online & Technology - Cell Phone and Computer Repair and Services": "Online & Technology - Cell Phone and Computer Repair and Services",
-        "Online & Technology - E-Commerce Stores": "Online & Technology - E-Commerce Stores",
-        "Online & Technology - Graphic / Websites / Web Design": "Online & Technology - Graphic / Websites / Web Design",
-        "Online & Technology - IT / Software / SaaS Businesses": "Online & Technology - IT / Software / SaaS Businesses",
-        "Other - All Non-Classifiable Businesses": "Other - All Non-Classifiable Businesses",
-        "Pet Services - Daycare, Boarding, Grooming / Pet Store and Supplies": "Pet Services - Daycare, Boarding, Grooming / Pet Store and Supplies",
-        "Pet Services - Veterinary Practices": "Pet Services - Veterinary Practices",
-        "Restaurants and Food - Bakeries / Donut Shops ": "Restaurants and Food - Bakeries / Donut Shops",
-        "Restaurants and Food - Bars, Pubs and Taverns": "Restaurants and Food - Bars, Pubs and Taverns",
-        "Restaurants and Food - Breweries / Distilleries": "Restaurants and Food - Breweries / Distilleries",
-        "Restaurants and Food - Delis and Sandwich Shops": "Restaurants and Food - Delis and Sandwich Shops",
-        "Restaurants and Food - Food Trucks": "Restaurants and Food - Food Trucks",
-        "Restaurants + Food - Diners, Fast Food, Cafes, Coffee, Ice Cream": "Restaurants + Food - Diners, Fast Food, Cafes, Coffee, Ice Cream",
-        "Retail - Beauty Supply Stores": "Retail - Beauty Supply Stores",
-        "Retail - Bike Shops": "Retail - Bike Shops",
-        "Retail - Clothing and Accessory Stores": "Retail - Clothing and Accessory Stores",
-        "Retail - Convenience Stores": "Retail - Convenience Stores",
-        "Retail - Flower Shops": "Retail - Flower Shops",
-        "Retail - Furniture and Furnishings Stores / Antique Shops": "Retail - Furniture and Furnishings Stores / Antique Shops",
-        "Retail - Grocery Stores and Supermarkets": "Retail - Grocery Stores and Supermarkets",
-        "Retail - Jewelry Stores / Pawn Shops": "Retail - Jewelry Stores / Pawn Shops",
-        "Retail - Liquor Stores": "Retail - Liquor Stores",
-        "Retail - Other": "Retail - Other",
-        "Retail - Pharmacies / Health Food and Nutrition": "Retail - Pharmacies / Health Food and Nutrition",
-        "Retail - Sporting Goods Stores and Shooting Ranges": "Retail - Sporting Goods Stores and Shooting Ranges",
-        "Retail - Vending Machines": "Retail - Vending Machines",
-        "Service Businesses - Amazon / Fedex / UPS Stores / Shipping Routes": "Service Businesses - Amazon / Fedex / UPS Stores / Shipping Routes",
-        "Service Businesses - Catering Companies": "Service Businesses - Catering Companies",
-        "Service Businesses - Cleaning Businesses": "Service Businesses - Cleaning Businesses",
-        "Service Businesses - Commercial Laundry / Laundromats and Coin Laundry": "Service Businesses - Commercial Laundry / Laundromats and Coin Laundry",
-        "Service Businesses - Consulting Businesses": "Service Businesses - Consulting Businesses",
-        "Service Businesses - Dry Cleaners": "Service Businesses - Dry Cleaners",
-        "Service Businesses - Event Planning Businesses": "Service Businesses - Event Planning Businesses",
-        "Service Businesses - Funeral Homes": "Service Businesses - Funeral Homes",
-        "Service Businesses - Landscaping and Yard Services": "Service Businesses - Landscaping and Yard Services",
-        "Service Businesses - Locksmith": "Service Businesses - Locksmith",
-        "Service Businesses - Marketing and Advertising Businesses": "Service Businesses - Marketing and Advertising Businesses",
-        "Service Businesses - Other": "Service Businesses - Other",
-        "Service Businesses - Pest Control": "Service Businesses - Pest Control",
-        "Service Businesses - Photography Businesses": "Service Businesses - Photography Businesses",
-        "Service Businesses - Property Management": "Service Businesses - Property Management",
-        "Service Businesses - Security": "Service Businesses - Security",
-        "Service Businesses - Staffing Agencies": "Service Businesses - Staffing Agencies",
-        "Service Businesses - Tutoring Businesses": "Service Businesses - Tutoring Businesses",
-        "Service Businesses - Water Businesses and Stores": "Service Businesses - Water Businesses and Stores",
-        "Transportation and Storage - Limo and Passenger Transportation": "Transportation and Storage - Limo and Passenger Transportation",
-        "Transportation and Storage - Moving and Shipping": "Transportation and Storage - Moving and Shipping",
-        "Transportation and Storage - Storage Facilities and Warehouses": "Transportation and Storage - Storage Facilities and Warehouses",
-        "Travel - Campgrounds / RV Parks / Mobile Home Parks": "Travel - Campgrounds / RV Parks / Mobile Home Parks",
-        "Travel - Hotels / Motels / Bed & Breakfast": "Travel - Hotels / Motels / Bed & Breakfast",
-        "Travel - Travel Agencies": "Travel - Travel Agencies",
-        "Wholesale and Distributors - Durable / Nondurable Goods": "Wholesale and Distributors - Durable / Nondurable Goods",
-    }
+
 
     businessindustryoptions = []
 
-    for key, value in dictofoptions.items():
-        # which key is over 75 characters
-        if len(key) > 75:
-            print("key is over 75 characters", key)
-        key = key[:75]  # Ensure keys are <= 75 characters
-        businessindustryoptions.append(
-            {
-                "text": {"type": "plain_text", "text": str(key)},
-                "value": str(value),
-            }
-        )
+    # Get industry options from the endpoint
+    try:
+        response = requests.get(f"{os.environ['API_URL']}/industry_options")
+        if response.status_code == 200:
+            businessindustryoptions = response.json()["options"]
+        else:
+            print(f"Error fetching industry options: {response.status_code}")
+            businessindustryoptions = []
+    except Exception as e:
+        print(f"Error fetching industry options: {e}")
+        businessindustryoptions = []
 
 
     inputfields = [

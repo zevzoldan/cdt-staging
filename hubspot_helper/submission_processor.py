@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 import requests
 
@@ -40,10 +41,14 @@ def process_deal_review_submission(datatosend, deal_id):
         create_open_community_acquisition_record,
     )
 
-    helper__send_submission_data_to_slack(
+    # Get the thread timestamp from the initial Slack message
+    thread_ts = helper__send_submission_data_to_slack(
         datatosend.get("user_id"), "deal_review_form", datatosend
     )
-
+    
+    # Add thread_ts to datatosend so it can be used for HubSpot operation logging
+    datatosend["slack_thread_ts"] = thread_ts
+    
     deal_id = create_open_community_acquisition_record(datatosend, deal_id)
 
     # save msg to HS
@@ -88,15 +93,16 @@ def helper__send_submission_data_to_slack(user_id, typeofsubmission, datatosend)
 
     slack_client = WebClient(token=os.environ["SLACK_BOT_TOKEN"])
 
+    # Create a more descriptive initial message
     msg = slack_client.chat_postMessage(
         channel="C08P4TFAPMZ",
-        text=f"New submission from {user_id}",
+        text=f"New {typeofsubmission} submission from <@{user_id}>",
         blocks=[
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"User: <@{user_id}>\nType: {typeofsubmission}",
+                    "text": f"*New Submission*\nUser: <@{user_id}>\nType: {typeofsubmission}\nTime: <!date^{int(datetime.now().timestamp())}^{'{date_num} {time_secs}'}|now>",
                 },
             },
         ],
@@ -104,8 +110,11 @@ def helper__send_submission_data_to_slack(user_id, typeofsubmission, datatosend)
 
     msg_ts = msg["ts"]
 
+    # Post submission data in thread
     slack_client.chat_postMessage(
         channel="C08P4TFAPMZ",
-        text=f"```{datatosend}```",
+        text=f"*Submission Data*\n```{datatosend}```",
         thread_ts=msg_ts,
     )
+    
+    return msg_ts  # Return the thread timestamp for HubSpot operation logging

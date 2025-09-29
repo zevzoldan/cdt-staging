@@ -48,6 +48,29 @@ def deals():
     return make_response("", 200)
 
 
+@app.route("/industry_options", methods=["GET"])
+def get_industry_options():
+    """
+    Returns a list of industry options formatted for Slack's dropdown menu.
+    Each option shows a truncated name (<=75 chars) in Slack but returns the full name to HubSpot.
+    """
+    try:
+        with open('industry_options.json', 'r') as f:
+            industry_mapping = json.load(f)['industry_mapping']
+            
+        options = []
+        for display_name, hubspot_value in industry_mapping.items():
+            # Truncate display name to 75 chars for Slack but keep full value for HubSpot
+            truncated_name = display_name[:75] if len(display_name) > 75 else display_name
+            options.append({
+                "text": {"type": "plain_text", "text": truncated_name},
+                "value": hubspot_value  # Full value for HubSpot
+            })
+            
+        return jsonify({"options": options})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/external_data_seeker", methods=["POST"])
 def external_data_seeker():
 
@@ -338,10 +361,24 @@ def button():
             if success_share_checkboxes != []:
                 datatosend["success_share_checkboxes"] = success_share_checkboxes
 
-            create_closed_community_acquisition_record(datatosend, deal_id)
-            helper__send_submission_data_to_slack(
+            # Get thread_ts from initial Slack message
+            thread_ts = helper__send_submission_data_to_slack(
                 user_id, "deal_closed_form", datatosend
             )
+            
+            # Add thread_ts to datatosend for HubSpot logging
+            datatosend["slack_thread_ts"] = thread_ts
+            
+            # Process in background thread
+            try:
+                thread = threading.Thread(
+                    target=create_closed_community_acquisition_record,
+                    args=(datatosend, deal_id),
+                )
+                thread.start()
+                # Don't join the thread here to avoid blocking the response
+            except Exception as e:
+                print(f"Error starting thread for closed deal submission: {e}")
             if trigger_slack_post:
                 listofitemstopost = []
                 print("success_share_checkboxes >>>", success_share_checkboxes)
