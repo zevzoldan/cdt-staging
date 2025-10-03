@@ -12,7 +12,28 @@ import requests
 from slack_sdk import WebClient
 from dotenv import load_dotenv
 
-# Industry options are now loaded dynamically from the /industry_options endpoint
+def get_industry_options():
+    """Load industry options from local JSON file"""
+    try:
+        with open('industry_options.json', 'r') as f:
+            data = json.load(f)
+            # Convert the mapping to the format needed for Slack options
+            options = []
+            for key, value in data['industry_mapping'].items():
+                options.append({
+                    "text": {"type": "plain_text", "text": key},
+                    "value": value
+                })
+            return options
+    except Exception as e:
+        logging.error(f"Error loading industry options: {e}")
+        # Return a minimal set of options to prevent modal errors
+        return [
+            {
+                "text": {"type": "plain_text", "text": "Other - All Non-Classifiable Businesses"},
+                "value": "Other - All Non-Classifiable Businesses"
+            }
+        ]
 
 from hubspot_helper.query import (
     deal_data_from_hubspot,
@@ -232,23 +253,11 @@ def basic_deal_info_form(
     deal_data = {}
 
 
-    businessindustryoptions = []
+    businessindustryoptions = get_industry_options()
     if deal_id:
         print("deal id is ", deal_id)
         deal_data = deal_data_from_hubspot(deal_id)  # Fetch data from HubSpot
         print(len(deal_data))
-    
-    # Get industry options from the endpoint
-    try:
-        response = requests.get(f"{os.environ['API_URL']}/industry_options")
-        if response.status_code == 200:
-            businessindustryoptions = response.json()["options"]
-        else:
-            print(f"Error fetching industry options: {response.status_code}")
-            businessindustryoptions = []
-    except Exception as e:
-        print(f"Error fetching industry options: {e}")
-        businessindustryoptions = []
 
     def get_initial_value(field):
         print(deal_data.get(field))
@@ -559,33 +568,8 @@ def deal_review_form_modal(
 
 
 
-    # Industry Options
-    businessindustryoptions = []
-    
-    # Get industry options from the endpoint
-    try:
-        response = requests.get(f"{os.environ['API_URL']}/industry_options")
-        if response.status_code == 200:
-            businessindustryoptions = response.json()["options"]
-        else:
-            print(f"Error fetching industry options: {response.status_code}")
-            businessindustryoptions = []
-    except Exception as e:
-        print(f"Error fetching industry options: {e}")
-        businessindustryoptions = []
-       
-
-    # Get industry options from the endpoint
-    try:
-        response = requests.get(f"{os.environ['API_URL']}/industry_options")
-        if response.status_code == 200:
-            businessindustryoptions = response.json()["options"]
-        else:
-            print(f"Error fetching industry options: {response.status_code}")
-            businessindustryoptions = []
-    except Exception as e:
-        print(f"Error fetching industry options: {e}")
-        businessindustryoptions = []
+    # Get industry options
+    businessindustryoptions = get_industry_options()
 
     # Form Fields
     # Check if this is a new deal or updating an existing deal
@@ -1429,19 +1413,7 @@ def deal_closed_form_modal(
 
 
 
-    businessindustryoptions = []
-
-    # Get industry options from the endpoint
-    try:
-        response = requests.get(f"{os.environ['API_URL']}/industry_options")
-        if response.status_code == 200:
-            businessindustryoptions = response.json()["options"]
-        else:
-            print(f"Error fetching industry options: {response.status_code}")
-            businessindustryoptions = []
-    except Exception as e:
-        print(f"Error fetching industry options: {e}")
-        businessindustryoptions = []
+    businessindustryoptions = get_industry_options()
 
 
     inputfields = [
